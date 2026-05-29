@@ -5,6 +5,8 @@ const composerModeButton = document.querySelector(".composer-mode");
 const composerSubmitButton = document.querySelector(".composer-submit");
 const composerModeLabel = composerModeButton?.querySelector("span:nth-child(2)");
 const ideaChips = document.querySelectorAll(".idea-chip");
+const primaryAuthLink = document.querySelector("#primary-auth-link");
+const secondaryAuthLink = document.querySelector("#secondary-auth-link");
 
 const THEME_KEY = "sojial-theme";
 const DRAFT_KEY = "sojial-composer-draft";
@@ -28,9 +30,7 @@ function safeRead(key, fallback = null) {
 function safeWrite(key, value) {
   try {
     window.localStorage.setItem(key, value);
-  } catch (error) {
-    // noop
-  }
+  } catch (error) {}
 }
 
 function applyTheme(theme) {
@@ -80,6 +80,20 @@ function loadTheme() {
   applyTheme(safeRead(THEME_KEY, "light"));
 }
 
+function hydrateAuthLinks() {
+  const currentUser = window.authStore?.getCurrentUser?.();
+
+  if (currentUser && primaryAuthLink && secondaryAuthLink) {
+    primaryAuthLink.textContent = "Profilini görüntüle";
+    primaryAuthLink.href = `profile.html?u=${currentUser.username}`;
+
+    secondaryAuthLink.textContent = "Panele dön";
+    secondaryAuthLink.href = `admin.html?session=${currentUser.username}`;
+  }
+
+  body.classList.remove("auth-pending");
+}
+
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
     const nextTheme = body.classList.contains("is-dark") ? "light" : "dark";
@@ -118,3 +132,4 @@ ideaChips.forEach((chip) => {
 
 loadTheme();
 applyComposerMode(getComposerMode());
+hydrateAuthLinks();

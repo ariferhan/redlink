@@ -2,13 +2,14 @@ import { mkdir, copyFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { defineConfig } from "vite";
 
-const staticJsFiles = [
+const staticFiles = [
   "script.js",
   "data.js",
   "auth.js",
   "auth-page.js",
   "admin.js",
   "profile-page.js",
+  ".htaccess",
 ];
 
 function copyStaticJsFiles() {
@@ -20,7 +21,7 @@ function copyStaticJsFiles() {
       outDir = config.build.outDir;
     },
     async writeBundle() {
-      for (const file of staticJsFiles) {
+      for (const file of staticFiles) {
         const from = resolve(process.cwd(), file);
         const to = resolve(process.cwd(), outDir, file);
         await mkdir(dirname(to), { recursive: true });

@@ -16,7 +16,7 @@
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body class="marketing-page">
+  <body class="marketing-page auth-pending">
     <div class="page-aura page-aura-left" aria-hidden="true"></div>
     <div class="page-aura page-aura-right" aria-hidden="true"></div>
 
@@ -26,12 +26,12 @@
         <span class="brandmark-text">sojial</span>
       </a>
 
-      <nav class="topbar-actions" aria-label="Hızlı işlemler">
+      <nav class="topbar-actions" id="topbar-actions" aria-label="Hızlı işlemler">
         <button class="ghost-icon" type="button" id="theme-toggle" aria-label="Temayı değiştir">
           ◐
         </button>
-        <a class="pill-button ghost" href="login.html">Giriş yap</a>
-        <a class="pill-button solid" href="register.html">Üye ol</a>
+        <a class="pill-button ghost" id="primary-auth-link" href="login.html">Giriş yap</a>
+        <a class="pill-button solid" id="secondary-auth-link" href="register.html">Üye ol</a>
       </nav>
     </header>
 
@@ -177,6 +177,8 @@
       </p>
     </footer>
 
+    <script src="data.js"></script>
+    <script src="auth.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

@@ -160,6 +160,10 @@ body.marketing-page.is-dark .topbar {
   gap: 10px;
 }
 
+.auth-pending .topbar-actions {
+  visibility: hidden;
+}
+
 .ghost-icon,
 .pill-button {
   display: inline-flex;
