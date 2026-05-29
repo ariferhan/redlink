@@ -22,6 +22,10 @@ let profileData = null;
 let editableLinks = [];
 let avatarImage = "";
 
+function renderIconMarkup(iconName, size = 18, className = "") {
+  return window.sojialIcons?.renderIcon(iconName, { size, className }) || "";
+}
+
 function getPublicProfileUrl() {
   if (window.location.protocol === "file:") {
     return new URL(`profile.html?u=${currentUser.username}`, window.location.href).href;
@@ -90,12 +94,12 @@ function createLinkRow(link) {
   row.dataset.linkId = link.id;
 
   const options = platformEntries
-    .map(([key, value]) => `<option value="${key}" ${key === link.platform ? "selected" : ""}>${value.icon} ${value.label}</option>`)
+    .map(([key, value]) => `<option value="${key}" ${key === link.platform ? "selected" : ""}>${value.label}</option>`)
     .join("");
 
   row.innerHTML = `
     <div class="link-badge">
-      <span class="icon">${meta.icon}</span>
+      <span class="icon">${renderIconMarkup(meta.icon, 18)}</span>
       <span>${meta.label}</span>
       <span class="link-hint">${meta.hint}</span>
     </div>
@@ -230,7 +234,7 @@ function renderPreview(data) {
     element.target = link.url && link.url !== "#" ? "_blank" : "_self";
     element.rel = "noreferrer";
     element.innerHTML = `
-      <span class="icon">${link.icon}</span>
+      <span class="icon">${renderIconMarkup(link.icon, 18)}</span>
       <span class="link-label">${link.label}</span>
     `;
     linksContainer.appendChild(element);
@@ -252,7 +256,7 @@ function setStatus(message, isError = false) {
 function refreshLinkRowMeta(row) {
   const platform = row.querySelector('[data-role="platform"]').value;
   const meta = getPlatformMeta(platform);
-  row.querySelector(".icon").textContent = meta.icon;
+  row.querySelector(".icon").innerHTML = renderIconMarkup(meta.icon, 18);
   row.querySelector(".link-badge span:nth-child(2)").textContent = meta.label;
   row.querySelector(".link-hint").textContent = meta.hint;
   row.querySelector('[data-role="url"]').placeholder = meta.hint;
@@ -299,16 +303,11 @@ async function saveProfile() {
 
 async function downloadQrSvg() {
   try {
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?format=svg&size=512x512&data=${encodeURIComponent(
-      getPublicProfileUrl()
-    )}`;
-    const response = await fetch(qrUrl);
-
-    if (!response.ok) {
-      throw new Error("QR servisi yanıt vermedi.");
+    if (!window.sojialQr?.toSvg) {
+      throw new Error("QR aracı hazır değil.");
     }
 
-    const svgMarkup = await response.text();
+    const svgMarkup = await window.sojialQr.toSvg(getPublicProfileUrl());
     const blob = new Blob([svgMarkup], { type: "image/svg+xml" });
     const downloadUrl = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -349,6 +348,7 @@ async function initializeAdmin() {
   buildLinkEditor();
   fillForm();
   renderPreview(profileData);
+  window.sojialIcons?.mount(document);
   document.body.classList.remove("admin-pending");
 
   form.addEventListener("input", () => {

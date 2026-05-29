@@ -13,10 +13,10 @@ const THEME_KEY = "sojial-theme";
 const DRAFT_KEY = "sojial-composer-draft";
 const COMPOSER_MODE_KEY = "sojial-composer-mode";
 const composerModes = [
-  { id: "discuss", label: "Tartış", placeholder: "Düşünceni paylaş, bir sohbet başlat..." },
-  { id: "ask", label: "Soru sor", placeholder: "Sormak istediğin konuyu yaz..." },
-  { id: "help", label: "Destek ol", placeholder: "Yardım edebileceğin konuyu yaz..." },
-  { id: "explore", label: "Keşfet", placeholder: "Keşfetmek istediğin alanı yaz..." },
+  { id: "discuss", label: "Tartış", icon: "discuss", placeholder: "Düşünceni paylaş, bir sohbet başlat..." },
+  { id: "ask", label: "Soru sor", icon: "ask", placeholder: "Sormak istediğin konuyu yaz..." },
+  { id: "help", label: "Destek ol", icon: "help", placeholder: "Yardım edebileceğin konuyu yaz..." },
+  { id: "explore", label: "Keşfet", icon: "explore", placeholder: "Keşfetmek istediğin alanı yaz..." },
 ];
 
 function safeRead(key, fallback = null) {
@@ -40,7 +40,7 @@ function applyTheme(theme) {
 
   if (themeToggle) {
     themeToggle.setAttribute("aria-pressed", String(isDark));
-    themeToggle.textContent = isDark ? "◑" : "◐";
+    themeToggle.innerHTML = window.sojialIcons?.renderIcon("sparkles", { size: 18 }) || "";
   }
 }
 
@@ -52,6 +52,12 @@ function getComposerMode() {
 function applyComposerMode(mode) {
   if (composerModeLabel) {
     composerModeLabel.textContent = mode.label;
+  }
+
+  const composerBadge = composerModeButton?.querySelector(".composer-badge");
+  if (composerBadge) {
+    composerBadge.dataset.icon = mode.icon;
+    composerBadge.innerHTML = window.sojialIcons?.renderIcon(mode.icon, { size: 16 }) || "";
   }
 
   if (composerField) {
@@ -99,6 +105,7 @@ async function hydrateAuthLinks() {
   }
 
   body.classList.remove("auth-pending");
+  window.sojialIcons?.mount(document);
 }
 
 if (themeToggle) {

@@ -13,23 +13,24 @@
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body class="profile-pending">
     <main class="scene">
       <div class="ambient ambient-left" aria-hidden="true"></div>
       <div class="ambient ambient-right" aria-hidden="true"></div>
       <div class="grain" aria-hidden="true"></div>
+      <div class="profile-loader" aria-live="polite">Profil yükleniyor...</div>
 
       <section class="profile-card" id="public-profile-card">
         <div class="profile-header">
           <div class="avatar-ring">
-            <div class="avatar" data-public="avatar">A</div>
+            <div class="avatar" data-public="avatar"></div>
           </div>
 
           <div class="identity">
-            <p class="hero-kicker" data-public="eyebrow">Kişisel Bağlantılar</p>
-            <h1 data-public="name">Profil</h1>
-            <p class="bio" data-public="bio">Bağlantılar birazdan burada görünecek.</p>
-            <p class="preview-address" data-public="address">sojial.app/profil</p>
+            <p class="hero-kicker" data-public="eyebrow"></p>
+            <h1 data-public="name"></h1>
+            <p class="bio" data-public="bio"></p>
+            <p class="preview-address" data-public="address"></p>
           </div>
         </div>
 
@@ -47,6 +48,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="supabase-service.js"></script>
+    <script src="icons.js"></script>
     <script src="data.js"></script>
     <script src="profile-page.js"></script>
   </body>

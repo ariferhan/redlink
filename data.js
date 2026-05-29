@@ -5,7 +5,7 @@ window.__sojialMemoryStore = window.__sojialMemoryStore || {};
 const SOCIAL_PLATFORMS = {
   profilePhoto: {
     label: "Profil Fotoğrafı",
-    icon: "◍",
+    icon: "image",
     hint: "Sistem içi gizli alan",
     buildUrl: (value) => value,
     cleanValue: (value) => value,
@@ -13,84 +13,84 @@ const SOCIAL_PLATFORMS = {
   },
   website: {
     label: "Website",
-    icon: "◌",
+    icon: "globe",
     hint: "Tam web site adresi ya da alan adı",
     buildUrl: (value) => (value.startsWith("http") ? value : `https://${value}`),
     cleanValue: (value) => value.replace(/^https?:\/\//, ""),
   },
   instagram: {
     label: "Instagram",
-    icon: "◎",
+    icon: "instagram",
     hint: "Kullanıcı adı ya da tam profil linki",
     buildUrl: (value) => (value.startsWith("http") ? value : `https://instagram.com/${value.replace(/^@/, "")}`),
     cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/$/, ""),
   },
   x: {
     label: "X",
-    icon: "𝕏",
+    icon: "x",
     hint: "Kullanıcı adı ya da tam profil linki",
     buildUrl: (value) => (value.startsWith("http") ? value : `https://x.com/${value.replace(/^@/, "")}`),
     cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?x\.com\//, "").replace(/\/$/, ""),
   },
   youtube: {
     label: "YouTube",
-    icon: "▶",
+    icon: "youtube",
     hint: "Kanal adı ya da tam kanal linki",
     buildUrl: (value) => (value.startsWith("http") ? value : `https://youtube.com/@${value.replace(/^@/, "")}`),
     cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?youtube\.com\/@?/, "").replace(/\/$/, ""),
   },
   linkedin: {
     label: "LinkedIn",
-    icon: "in",
+    icon: "linkedin",
     hint: "Kullanıcı adı ya da tam profil linki",
     buildUrl: (value) => (value.startsWith("http") ? value : `https://linkedin.com/in/${value.replace(/^@/, "")}`),
     cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, "").replace(/\/$/, ""),
   },
   tiktok: {
     label: "TikTok",
-    icon: "♪",
+    icon: "tiktok",
     hint: "Kullanıcı adı ya da tam profil linki",
     buildUrl: (value) => (value.startsWith("http") ? value : `https://tiktok.com/@${value.replace(/^@/, "")}`),
     cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?tiktok\.com\/@?/, "").replace(/\/$/, ""),
   },
   telegram: {
     label: "Telegram",
-    icon: "✈",
+    icon: "telegram",
     hint: "Kullanıcı adı ya da t.me linki",
     buildUrl: (value) => (value.startsWith("http") ? value : `https://t.me/${value.replace(/^@/, "")}`),
     cleanValue: (value) => value.replace(/^https?:\/\/t\.me\//, "").replace(/\/$/, ""),
   },
   whatsapp: {
     label: "WhatsApp",
-    icon: "✆",
+    icon: "whatsapp",
     hint: "Numara ya da wa.me linki",
     buildUrl: (value) => (value.startsWith("http") ? value : `https://wa.me/${value.replace(/\D/g, "")}`),
     cleanValue: (value) => value.replace(/^https?:\/\/wa\.me\//, "").replace(/\/$/, ""),
   },
   facebook: {
     label: "Facebook",
-    icon: "f",
+    icon: "facebook",
     hint: "Kullanıcı adı ya da profil linki",
     buildUrl: (value) => (value.startsWith("http") ? value : `https://facebook.com/${value.replace(/^@/, "")}`),
     cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?facebook\.com\//, "").replace(/\/$/, ""),
   },
   discord: {
     label: "Discord",
-    icon: "◎",
+    icon: "discord",
     hint: "Davet linki ya da kullanıcı adı",
     buildUrl: (value) => (value.startsWith("http") ? value : `https://discord.gg/${value.replace(/^@/, "")}`),
     cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?discord\.(gg|com\/invite)\//, "").replace(/\/$/, ""),
   },
   twitch: {
     label: "Twitch",
-    icon: "☰",
+    icon: "twitch",
     hint: "Kanal adı ya da tam profil linki",
     buildUrl: (value) => (value.startsWith("http") ? value : `https://twitch.tv/${value.replace(/^@/, "")}`),
     cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?twitch\.tv\//, "").replace(/\/$/, ""),
   },
   github: {
     label: "GitHub",
-    icon: "⌘",
+    icon: "github",
     hint: "Kullanıcı adı ya da profil linki",
     buildUrl: (value) => (value.startsWith("http") ? value : `https://github.com/${value.replace(/^@/, "")}`),
     cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, ""),
@@ -270,6 +270,15 @@ async function loadProfileData(username = "admin", name = "Demo Admin") {
   return loadProfileDataLocal(username, name);
 }
 
+async function loadPublicProfileData(username = "admin", name = "Demo Admin") {
+  if (window.supabaseService?.isReady()) {
+    const remoteProfile = await window.supabaseService.getProfileByUsername(username);
+    return remoteProfile ? mapRemoteProfile(remoteProfile, username, name) : null;
+  }
+
+  return loadProfileDataLocal(username, name);
+}
+
 async function saveProfileData(username, data, name = "Demo Admin") {
   if (window.supabaseService?.isReady()) {
     const payload = mergeProfileData({ ...data, username }, buildDefaultProfile(username, name));
@@ -305,6 +314,7 @@ window.profileStore = {
   defaultProfileData,
   visiblePlatforms: Object.entries(SOCIAL_PLATFORMS).filter(([, meta]) => !meta.hidden),
   loadProfileData,
+  loadPublicProfileData,
   saveProfileData,
   loadProfileDataLocal,
   saveProfileDataLocal,

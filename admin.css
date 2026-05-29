@@ -105,8 +105,9 @@ body {
 }
 
 .dashboard-hero-cards {
-  display: block;
+  display: grid;
   margin-top: 24px;
+  width: 100%;
 }
 
 .hero-panel,
@@ -159,6 +160,7 @@ body {
   align-items: center;
   gap: 10px;
   flex-wrap: nowrap;
+  justify-content: flex-end;
 }
 
 #public-route {
@@ -355,6 +357,12 @@ body {
   border-radius: 14px;
   background: rgba(239, 243, 252, 0.9);
   box-shadow: inset 0 0 0 1px rgba(214, 221, 234, 0.9);
+}
+
+.link-badge .icon svg,
+.section-icon svg {
+  width: 18px;
+  height: 18px;
 }
 
 .link-hint {

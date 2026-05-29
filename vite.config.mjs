@@ -12,6 +12,7 @@ const staticFiles = [
   "profile-page.js",
   "supabase-config.js",
   "supabase-service.js",
+  "icons.js",
   ".htaccess",
 ];
 

@@ -150,8 +150,11 @@ body.marketing-page.is-dark .topbar {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  font-size: 1.35rem;
-  line-height: 1;
+}
+
+.icon-svg {
+  display: block;
+  flex: 0 0 auto;
 }
 
 .avatar.has-image {
@@ -276,7 +279,88 @@ body.marketing-page.is-dark .pill-button.solid {
 .hero-mark {
   margin-top: 20px;
   color: var(--brand);
-  font-size: 1.7rem;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.social-marquee {
+  width: min(100%, 960px);
+  margin: 26px auto 0;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
+}
+
+.social-marquee-track {
+  display: flex;
+  gap: 12px;
+  width: max-content;
+  animation: marquee-slide 24s linear infinite;
+}
+
+.marquee-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--muted);
+  font-size: 0.94rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.hero-orbit {
+  position: relative;
+  width: min(100%, 920px);
+  height: 110px;
+  margin: 22px auto 0;
+}
+
+.orbit-card {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 18px 40px rgba(132, 143, 172, 0.14);
+  color: var(--muted);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.orbit-card strong {
+  color: var(--text);
+}
+
+.orbit-primary {
+  top: 14px;
+  left: 18%;
+  animation: float-slow 5.5s ease-in-out infinite;
+}
+
+.orbit-secondary {
+  top: 0;
+  right: 18%;
+  animation: float-slow 6.4s ease-in-out infinite reverse;
+}
+
+.orbit-tertiary {
+  bottom: 0;
+  left: 29%;
+  animation: float-slow 5.8s ease-in-out infinite 0.6s;
+}
+
+.orbit-quaternary {
+  bottom: 12px;
+  right: 28%;
+  animation: float-slow 6.2s ease-in-out infinite 1s;
 }
 
 .composer {
@@ -392,6 +476,42 @@ body.marketing-page.is-dark .pill-button.solid {
   background: var(--brand-soft);
   color: var(--brand);
   font-size: 0.88rem;
+}
+
+.value-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 44px;
+}
+
+.value-card {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: var(--shadow);
+}
+
+.value-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.value-card h2 {
+  margin: 16px 0 8px;
+  font-size: 1.12rem;
+}
+
+.value-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
 }
 
 .trust-row {
@@ -550,6 +670,9 @@ body.marketing-page.is-dark .pill-button.solid {
 }
 
 .route-links span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 10px 14px;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -717,6 +840,19 @@ body.marketing-page.is-dark .pill-button.solid {
   box-shadow: 0 12px 30px rgba(133, 138, 156, 0.12);
 }
 
+.social-link .icon,
+.composer-tools span,
+.brandmark-icon,
+.hero-mark,
+.idea-chip-icon,
+.trust-icon,
+.value-icon,
+.section-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .social-link span:last-child,
 .theme-label {
   font-size: 1.02rem;
@@ -775,7 +911,48 @@ body.marketing-page.is-dark .pill-button.solid {
   box-shadow: 0 10px 24px rgba(131, 140, 166, 0.18);
 }
 
+.profile-loader {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  color: var(--soft);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.profile-pending .profile-card {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+body:not(.profile-pending) .profile-loader {
+  display: none;
+}
+
+@keyframes marquee-slide {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
 @media (max-width: 1080px) {
+  .value-grid,
   .trust-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 22px;
@@ -819,6 +996,16 @@ body.marketing-page.is-dark .pill-button.solid {
     grid-template-columns: 1fr;
   }
 
+  .hero-orbit {
+    height: auto;
+    display: grid;
+    gap: 12px;
+  }
+
+  .orbit-card {
+    position: static;
+  }
+
   .composer-tools {
     justify-content: center;
   }
@@ -827,6 +1014,7 @@ body.marketing-page.is-dark .pill-button.solid {
     width: 100%;
   }
 
+  .value-grid,
   .trust-row {
     grid-template-columns: 1fr;
     margin-top: 64px;

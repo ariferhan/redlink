@@ -1,3 +1,5 @@
+const PUBLIC_CACHE_PREFIX = "sojial-public-cache";
+
 function resolveProfileUsername() {
   const params = new URLSearchParams(window.location.search);
   const queryUsername = (params.get("u") || "").trim().toLowerCase();
@@ -44,6 +46,25 @@ function deriveInitials(name = "", fallback = "A") {
   return fallback.slice(0, 2).toUpperCase();
 }
 
+function getCacheKey(username) {
+  return `${PUBLIC_CACHE_PREFIX}:${username}`;
+}
+
+function readCachedProfile(username) {
+  try {
+    const raw = window.sessionStorage.getItem(getCacheKey(username));
+    return raw ? JSON.parse(raw) : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function writeCachedProfile(username, profileData) {
+  try {
+    window.sessionStorage.setItem(getCacheKey(username), JSON.stringify(profileData));
+  } catch (error) {}
+}
+
 function renderPublicAvatar(profileData, username) {
   const avatarElement = document.querySelector('[data-public="avatar"]');
   avatarElement.classList.remove("has-image");
@@ -53,6 +74,7 @@ function renderPublicAvatar(profileData, username) {
     const image = document.createElement("img");
     image.src = profileData.avatarImage;
     image.alt = `${profileData.name} profil fotoğrafı`;
+    image.loading = "eager";
     avatarElement.appendChild(image);
     avatarElement.classList.add("has-image");
     return;
@@ -61,11 +83,9 @@ function renderPublicAvatar(profileData, username) {
   avatarElement.textContent = deriveInitials(profileData.name, username);
 }
 
-async function initializePublicProfile() {
-  const username = resolveProfileUsername();
-  const publicLinks = document.querySelector("#public-links");
-  const profileData = await window.profileStore.loadProfileData(username, username);
+function renderProfile(profileData, username) {
   const activeLanguage = profileData.activeLanguage || "tr";
+  const publicLinks = document.querySelector("#public-links");
 
   document.title = `sojial | ${profileData.name}`;
   renderPublicAvatar(profileData, username);
@@ -83,11 +103,44 @@ async function initializePublicProfile() {
     element.target = link.url && link.url !== "#" ? "_blank" : "_self";
     element.rel = "noreferrer";
     element.innerHTML = `
-      <span class="icon">${link.icon}</span>
+      <span class="icon">${window.sojialIcons?.renderIcon(link.icon, { size: 18 }) || ""}</span>
       <span class="link-label">${link.label}</span>
     `;
     publicLinks.appendChild(element);
   });
+
+  document.body.classList.remove("profile-pending");
+}
+
+function showProfileError() {
+  document.querySelector('[data-public="eyebrow"]').textContent = "Profil bulunamadı";
+  document.querySelector('[data-public="name"]').textContent = "Bu bağlantı hazır değil";
+  document.querySelector('[data-public="bio"]').textContent =
+    "Paylaşılacak profil henüz yayınlanmamış olabilir ya da kullanıcı adı yanlış yazılmış olabilir.";
+  document.querySelector('[data-public="address"]').textContent = "sojial.app";
+  document.querySelector("#public-links").innerHTML = "";
+  document.body.classList.remove("profile-pending");
+}
+
+async function initializePublicProfile() {
+  const username = resolveProfileUsername();
+  const cachedProfile = readCachedProfile(username);
+
+  if (cachedProfile) {
+    renderProfile(cachedProfile, username);
+  }
+
+  const profileData = await window.profileStore.loadPublicProfileData(username, username);
+
+  if (!profileData) {
+    if (!cachedProfile) {
+      showProfileError();
+    }
+    return;
+  }
+
+  writeCachedProfile(username, profileData);
+  renderProfile(profileData, username);
 }
 
 initializePublicProfile();

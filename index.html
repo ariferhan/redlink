@@ -22,13 +22,13 @@
 
     <header class="topbar">
       <a class="brandmark" href="index.html" aria-label="sojial ana sayfa">
-        <span class="brandmark-icon">◡</span>
+        <span class="brandmark-icon" data-icon="brand" data-icon-size="28"></span>
         <span class="brandmark-text">sojial</span>
       </a>
 
       <nav class="topbar-actions" id="topbar-actions" aria-label="Hızlı işlemler">
         <button class="ghost-icon" type="button" id="theme-toggle" aria-label="Temayı değiştir">
-          ◐
+          <span data-icon="sparkles" data-icon-size="18"></span>
         </button>
         <a class="pill-button ghost" id="primary-auth-link" href="login.html">Giriş yap</a>
         <a class="pill-button solid" id="secondary-auth-link" href="register.html">Üye ol</a>
@@ -40,19 +40,57 @@
 
     <main class="landing-shell">
       <section class="hero-block">
-        <p class="hero-kicker">Sosyal olmanın daha sakin hali</p>
-        <h1>Bugün seni buraya ne getirdi?</h1>
+        <p class="hero-kicker">Tek linklik dijital kartvizit</p>
+        <h1>Tüm sosyal hesaplarını tek bir sojial bağlantısında topla.</h1>
         <p class="hero-copy">
-          Düşünceni paylaş, yardım iste, bağ kur veya keşfet. Profilini oluştur,
-          kullanıcı adını al ve dijital varlığını daha temiz bir yerden başlat.
+          sojial; Instagram, X, YouTube, LinkedIn, Telegram, WhatsApp ve diğer
+          hesaplarını tek bir kişisel sayfada birleştiren sade bir profil alanı.
+          Her kullanıcı kendi adresini alır, bağlantılarını ekler ve bunu dijital
+          kartvizit gibi paylaşır.
         </p>
-        <div class="hero-mark">♡</div>
+        <div class="hero-mark" data-icon="heart" data-icon-size="28"></div>
+
+        <div class="social-marquee" aria-label="Desteklenen ağlar">
+          <div class="social-marquee-track">
+            <span class="marquee-pill"><span data-icon="instagram" data-icon-size="16"></span> Instagram</span>
+            <span class="marquee-pill"><span data-icon="x" data-icon-size="16"></span> X</span>
+            <span class="marquee-pill"><span data-icon="youtube" data-icon-size="16"></span> YouTube</span>
+            <span class="marquee-pill"><span data-icon="linkedin" data-icon-size="16"></span> LinkedIn</span>
+            <span class="marquee-pill"><span data-icon="telegram" data-icon-size="16"></span> Telegram</span>
+            <span class="marquee-pill"><span data-icon="whatsapp" data-icon-size="16"></span> WhatsApp</span>
+            <span class="marquee-pill"><span data-icon="github" data-icon-size="16"></span> GitHub</span>
+            <span class="marquee-pill"><span data-icon="globe" data-icon-size="16"></span> Web sitesi</span>
+            <span class="marquee-pill"><span data-icon="instagram" data-icon-size="16"></span> Instagram</span>
+            <span class="marquee-pill"><span data-icon="x" data-icon-size="16"></span> X</span>
+            <span class="marquee-pill"><span data-icon="youtube" data-icon-size="16"></span> YouTube</span>
+            <span class="marquee-pill"><span data-icon="linkedin" data-icon-size="16"></span> LinkedIn</span>
+          </div>
+        </div>
+
+        <div class="hero-orbit" aria-hidden="true">
+          <div class="orbit-card orbit-primary">
+            <span data-icon="links" data-icon-size="18"></span>
+            <strong>sojial.app/ariferhan</strong>
+          </div>
+          <div class="orbit-card orbit-secondary">
+            <span data-icon="instagram" data-icon-size="18"></span>
+            <span>@ariferhan</span>
+          </div>
+          <div class="orbit-card orbit-tertiary">
+            <span data-icon="youtube" data-icon-size="18"></span>
+            <span>YouTube</span>
+          </div>
+          <div class="orbit-card orbit-quaternary">
+            <span data-icon="telegram" data-icon-size="18"></span>
+            <span>Telegram</span>
+          </div>
+        </div>
 
         <div class="composer">
           <button class="composer-mode" type="button">
-            <span class="composer-badge">◌</span>
+            <span class="composer-badge" data-icon="discuss" data-icon-size="16"></span>
             <span>Tartış</span>
-            <span class="composer-caret">⌄</span>
+            <span class="composer-caret" data-icon="chevronDown" data-icon-size="16"></span>
           </button>
 
           <label class="composer-input">
@@ -65,9 +103,9 @@
           </label>
 
           <div class="composer-tools" aria-hidden="true">
-            <span>◫</span>
-            <span>⌲</span>
-            <span>☺</span>
+            <span data-icon="grid" data-icon-size="18"></span>
+            <span data-icon="play" data-icon-size="18"></span>
+            <span data-icon="smile" data-icon-size="18"></span>
           </div>
 
           <button class="pill-button composer-submit" type="button">Paylaş</button>
@@ -77,53 +115,71 @@
           <p>İlham lazım mı? Bunlardan biriyle başlayabilirsin</p>
           <div class="idea-chips">
             <button class="idea-chip" type="button">
-              <span class="idea-chip-icon">⌘</span>
+              <span class="idea-chip-icon" data-icon="users" data-icon-size="15"></span>
               <span>Benimle aynı ilgi alanlarını paylaşan insanlarla tanışmak istiyorum</span>
             </button>
             <button class="idea-chip" type="button">
-              <span class="idea-chip-icon">✦</span>
+              <span class="idea-chip-icon" data-icon="sparkles" data-icon-size="15"></span>
               <span>Benim için önemli bir konuda fikir almak istiyorum</span>
             </button>
             <button class="idea-chip" type="button">
-              <span class="idea-chip-icon">⇄</span>
+              <span class="idea-chip-icon" data-icon="help" data-icon-size="15"></span>
               <span>Becerilerimle birine yardımcı olabilirim</span>
             </button>
             <button class="idea-chip" type="button">
-              <span class="idea-chip-icon">◎</span>
+              <span class="idea-chip-icon" data-icon="globe" data-icon-size="15"></span>
               <span>Bulunduğum bölgede neler oluyor görmek istiyorum</span>
             </button>
             <button class="idea-chip centered" type="button">
-              <span class="idea-chip-icon">◌</span>
+              <span class="idea-chip-icon" data-icon="discuss" data-icon-size="15"></span>
               <span>Benim için anlamlı bir konuda konuşmak istiyorum</span>
             </button>
           </div>
         </div>
       </section>
 
+      <section class="value-grid" aria-label="Sojial ne işe yarar?">
+        <article class="value-card">
+          <span class="value-icon" data-icon="links" data-icon-size="20"></span>
+          <h2>Tek bağlantı, tüm ağların</h2>
+          <p>Her kullanıcıya paylaşılabilir tek bir adres verilir. Profilini bu linkten herkes görebilir.</p>
+        </article>
+        <article class="value-card">
+          <span class="value-icon" data-icon="profile" data-icon-size="20"></span>
+          <h2>Kendi dijital kartvizitin</h2>
+          <p>Adın, kısa açıklaman, fotoğrafın ve sosyal hesapların tek görünümde bir araya gelir.</p>
+        </article>
+        <article class="value-card">
+          <span class="value-icon" data-icon="sparkles" data-icon-size="20"></span>
+          <h2>Temiz ve hızlı paylaşım</h2>
+          <p>Bio’daki dağınıklığı kaldırır. Tek linkle markanı, işini veya kişisel varlığını taşırsın.</p>
+        </article>
+      </section>
+
       <section class="trust-row" aria-label="Platform avantajları">
         <article class="trust-card">
-          <span class="trust-icon privacy">◍</span>
+          <span class="trust-icon privacy" data-icon="shield" data-icon-size="18"></span>
           <div>
             <h2>Gizliliğin önemli</h2>
             <p>Neyi kimin göreceğine sen karar verirsin.</p>
           </div>
         </article>
         <article class="trust-card">
-          <span class="trust-icon support">◌</span>
+          <span class="trust-icon support" data-icon="users" data-icon-size="18"></span>
           <div>
             <h2>Gerçek insanlar, gerçek destek</h2>
             <p>Seninle önemli olan şeylerin arasına algoritma girmez.</p>
           </div>
         </article>
         <article class="trust-card">
-          <span class="trust-icon local">⌘</span>
+          <span class="trust-icon local" data-icon="globe" data-icon-size="18"></span>
           <div>
             <h2>Yerel ve global</h2>
             <p>Mahallenden dünyaya uzanan sade bir bağ kurarsın.</p>
           </div>
         </article>
         <article class="trust-card">
-          <span class="trust-icon purpose">✦</span>
+          <span class="trust-icon purpose" data-icon="sparkles" data-icon-size="18"></span>
           <div>
             <h2>Amaca uygun tasarım</h2>
             <p>İlgi yerine niyeti ve insanı öne çıkaran bir deneyim.</p>
@@ -164,9 +220,9 @@
             <h3>Arif Erhan</h3>
             <p>Üreten, tasarlayan ve interneti merak eden biri.</p>
             <div class="route-links">
-              <span>YouTube</span>
-              <span>Instagram</span>
-              <span>Website</span>
+              <span><span data-icon="youtube" data-icon-size="14"></span> YouTube</span>
+              <span><span data-icon="instagram" data-icon-size="14"></span> Instagram</span>
+              <span><span data-icon="globe" data-icon-size="14"></span> Website</span>
             </div>
           </div>
         </div>
@@ -183,6 +239,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="supabase-service.js"></script>
+    <script src="icons.js"></script>
     <script src="data.js"></script>
     <script src="auth.js"></script>
     <script src="script.js"></script>
