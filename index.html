@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arif | Sosyal Medya Kartı</title>
+    <meta
+      name="description"
+      content="Arif için hazırlanmış kişisel sosyal medya bağlantı ekranı."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="scene">
+      <div class="ambient ambient-left" aria-hidden="true"></div>
+      <div class="ambient ambient-right" aria-hidden="true"></div>
+      <div class="grain" aria-hidden="true"></div>
+
+      <a class="admin-entry" href="admin.html">Yönetim Paneli</a>
+
+      <section class="profile-card" aria-label="Arif sosyal medya kartı">
+        <div class="profile-header">
+          <div class="avatar-ring">
+            <div class="avatar">A</div>
+          </div>
+
+          <div class="identity">
+            <p class="eyebrow">Kişisel Bağlantılar</p>
+            <h1>Arif</h1>
+            <p class="bio">
+              Tasarım, yazılım ve dijital üretim odaklı kişisel bağlantı ekranı.
+            </p>
+          </div>
+        </div>
+
+        <div class="links" aria-label="Sosyal medya bağlantıları">
+          <a class="social-link youtube" href="#" aria-label="YouTube profili" data-link="youtube">
+            <span class="icon">▶</span>
+            <span class="link-label">YouTube</span>
+          </a>
+
+          <a class="social-link instagram" href="#" aria-label="Instagram profili" data-link="instagram">
+            <span class="icon">◎</span>
+            <span class="link-label">Instagram</span>
+          </a>
+
+          <a class="social-link tiktok" href="#" aria-label="TikTok profili" data-link="tiktok">
+            <span class="icon">♪</span>
+            <span class="link-label">TikTok</span>
+          </a>
+
+          <a class="social-link x" href="#" aria-label="X profili" data-link="x">
+            <span class="icon">𝕏</span>
+            <span class="link-label">X (Twitter)</span>
+          </a>
+
+          <a class="social-link linkedin" href="#" aria-label="LinkedIn profili" data-link="linkedin">
+            <span class="icon">in</span>
+            <span class="link-label">LinkedIn</span>
+          </a>
+
+          <a class="social-link website" href="#" aria-label="Kişisel web sitesi" data-link="website">
+            <span class="icon">◌</span>
+            <span class="link-label">Web Sitem</span>
+          </a>
+        </div>
+
+        <div class="toolbar">
+          <div class="locale-switch" role="group" aria-label="Dil secimi">
+            <button class="locale is-active" type="button" data-lang="tr">TR</button>
+            <button class="locale" type="button" data-lang="en">EN</button>
+            <button class="locale" type="button" data-lang="de">DE</button>
+          </div>
+
+          <button class="theme-toggle" type="button" aria-pressed="false">
+            <span class="theme-icon">◐</span>
+            <span class="theme-label">Karanlık Tema</span>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
