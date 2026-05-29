@@ -1,87 +1,225 @@
-const STORAGE_KEY = "personal-social-card-data";
+const PROFILE_STORAGE_KEY = "sojial-profiles";
 
-const defaultProfileData = {
-  name: "Arif",
-  avatarLetter: "A",
-  title: {
-    tr: "Kişisel Bağlantılar",
-    en: "Personal Links",
-    de: "Persönliche Links",
+window.__sojialMemoryStore = window.__sojialMemoryStore || {};
+
+const SOCIAL_PLATFORMS = {
+  website: {
+    label: "Website",
+    icon: "◌",
+    hint: "Tam web site adresi ya da alan adı",
+    buildUrl: (value) => (value.startsWith("http") ? value : `https://${value}`),
+    cleanValue: (value) => value.replace(/^https?:\/\//, ""),
   },
-  bio: {
-    tr: "Tasarım, yazılım ve dijital üretim odaklı kişisel bağlantı ekranı.",
-    en: "A personal profile hub focused on design, software, and digital making.",
-    de: "Eine persönliche Profilseite für Design, Software und digitale Produktion.",
+  instagram: {
+    label: "Instagram",
+    icon: "◎",
+    hint: "Kullanıcı adı ya da tam profil linki",
+    buildUrl: (value) => (value.startsWith("http") ? value : `https://instagram.com/${value.replace(/^@/, "")}`),
+    cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/$/, ""),
   },
-  themeLabel: {
-    tr: "Karanlık Tema",
-    en: "Dark Theme",
-    de: "Dunkles Thema",
+  x: {
+    label: "X",
+    icon: "𝕏",
+    hint: "Kullanıcı adı ya da tam profil linki",
+    buildUrl: (value) => (value.startsWith("http") ? value : `https://x.com/${value.replace(/^@/, "")}`),
+    cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?x\.com\//, "").replace(/\/$/, ""),
   },
-  activeLanguage: "tr",
-  darkMode: false,
-  links: [
-    { key: "youtube", label: "YouTube", url: "#", icon: "▶" },
-    { key: "instagram", label: "Instagram", url: "#", icon: "◎" },
-    { key: "tiktok", label: "TikTok", url: "#", icon: "♪" },
-    { key: "x", label: "X (Twitter)", url: "#", icon: "𝕏" },
-    { key: "linkedin", label: "LinkedIn", url: "#", icon: "in" },
-    { key: "website", label: "Web Sitem", url: "#", icon: "◌" },
-  ],
+  youtube: {
+    label: "YouTube",
+    icon: "▶",
+    hint: "Kanal adı ya da tam kanal linki",
+    buildUrl: (value) => (value.startsWith("http") ? value : `https://youtube.com/@${value.replace(/^@/, "")}`),
+    cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?youtube\.com\/@?/, "").replace(/\/$/, ""),
+  },
+  linkedin: {
+    label: "LinkedIn",
+    icon: "in",
+    hint: "Kullanıcı adı ya da tam profil linki",
+    buildUrl: (value) => (value.startsWith("http") ? value : `https://linkedin.com/in/${value.replace(/^@/, "")}`),
+    cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, "").replace(/\/$/, ""),
+  },
+  tiktok: {
+    label: "TikTok",
+    icon: "♪",
+    hint: "Kullanıcı adı ya da tam profil linki",
+    buildUrl: (value) => (value.startsWith("http") ? value : `https://tiktok.com/@${value.replace(/^@/, "")}`),
+    cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?tiktok\.com\/@?/, "").replace(/\/$/, ""),
+  },
+  telegram: {
+    label: "Telegram",
+    icon: "✈",
+    hint: "Kullanıcı adı ya da t.me linki",
+    buildUrl: (value) => (value.startsWith("http") ? value : `https://t.me/${value.replace(/^@/, "")}`),
+    cleanValue: (value) => value.replace(/^https?:\/\/t\.me\//, "").replace(/\/$/, ""),
+  },
+  whatsapp: {
+    label: "WhatsApp",
+    icon: "✆",
+    hint: "Numara ya da wa.me linki",
+    buildUrl: (value) => (value.startsWith("http") ? value : `https://wa.me/${value.replace(/\D/g, "")}`),
+    cleanValue: (value) => value.replace(/^https?:\/\/wa\.me\//, "").replace(/\/$/, ""),
+  },
+  facebook: {
+    label: "Facebook",
+    icon: "f",
+    hint: "Kullanıcı adı ya da profil linki",
+    buildUrl: (value) => (value.startsWith("http") ? value : `https://facebook.com/${value.replace(/^@/, "")}`),
+    cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?facebook\.com\//, "").replace(/\/$/, ""),
+  },
+  discord: {
+    label: "Discord",
+    icon: "◎",
+    hint: "Davet linki ya da kullanıcı adı",
+    buildUrl: (value) => (value.startsWith("http") ? value : `https://discord.gg/${value.replace(/^@/, "")}`),
+    cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?discord\.(gg|com\/invite)\//, "").replace(/\/$/, ""),
+  },
+  twitch: {
+    label: "Twitch",
+    icon: "☰",
+    hint: "Kanal adı ya da tam profil linki",
+    buildUrl: (value) => (value.startsWith("http") ? value : `https://twitch.tv/${value.replace(/^@/, "")}`),
+    cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?twitch\.tv\//, "").replace(/\/$/, ""),
+  },
+  github: {
+    label: "GitHub",
+    icon: "⌘",
+    hint: "Kullanıcı adı ya da profil linki",
+    buildUrl: (value) => (value.startsWith("http") ? value : `https://github.com/${value.replace(/^@/, "")}`),
+    cleanValue: (value) => value.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, ""),
+  },
 };
 
-function cloneDefaultData() {
-  return JSON.parse(JSON.stringify(defaultProfileData));
+function readStorage(key, fallbackValue) {
+  try {
+    const rawValue = window.localStorage.getItem(key);
+    if (rawValue !== null) {
+      return JSON.parse(rawValue);
+    }
+  } catch (error) {}
+
+  return key in window.__sojialMemoryStore ? window.__sojialMemoryStore[key] : fallbackValue;
 }
 
-function mergeProfileData(savedData = {}) {
-  const merged = cloneDefaultData();
+function writeStorage(key, value) {
+  window.__sojialMemoryStore[key] = value;
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {}
+}
+
+function createLink(id, platform, value = "#", label = null) {
+  const meta = SOCIAL_PLATFORMS[platform];
+  return {
+    id,
+    platform,
+    label: label || meta.label,
+    url: value,
+    icon: meta.icon,
+  };
+}
+
+function buildDefaultProfile(username = "admin", name = "Demo Admin") {
+  const initial = name.trim().charAt(0).toUpperCase() || username.trim().charAt(0).toUpperCase() || "A";
+
+  return {
+    name,
+    avatarLetter: initial,
+    title: {
+      tr: "Kişisel Bağlantılar",
+      en: "Personal Links",
+      de: "Persönliche Links",
+    },
+    bio: {
+      tr: `${name} için hazırlanmış sade profil ve bağlantı alanı.`,
+      en: `A simple profile and link page prepared for ${name}.`,
+      de: `Eine schlichte Profil- und Linkseite für ${name}.`,
+    },
+    activeLanguage: "tr",
+    darkMode: false,
+    links: [
+      createLink("link-1", "website", `https://sojial.app/${username}`, "Web Sitem"),
+      createLink("link-2", "instagram"),
+      createLink("link-3", "x"),
+      createLink("link-4", "linkedin"),
+    ],
+  };
+}
+
+const defaultProfileData = buildDefaultProfile();
+
+function cloneProfileData(data) {
+  return JSON.parse(JSON.stringify(data));
+}
+
+function hydrateLinks(links = [], fallbackLinks = defaultProfileData.links) {
+  if (!Array.isArray(links) || links.length === 0) {
+    return cloneProfileData(fallbackLinks);
+  }
+
+  return links.map((link, index) => {
+    const platform = SOCIAL_PLATFORMS[link.platform] ? link.platform : "website";
+    const meta = SOCIAL_PLATFORMS[platform];
+    return {
+      id: link.id || `link-${index + 1}`,
+      platform,
+      label: link.label || meta.label,
+      url: link.url || "#",
+      icon: link.icon || meta.icon,
+    };
+  });
+}
+
+function mergeProfileData(savedData = {}, fallbackData = defaultProfileData) {
+  const merged = cloneProfileData(fallbackData);
 
   merged.name = savedData.name || merged.name;
   merged.avatarLetter = savedData.avatarLetter || merged.avatarLetter;
   merged.activeLanguage = savedData.activeLanguage || merged.activeLanguage;
   merged.darkMode = typeof savedData.darkMode === "boolean" ? savedData.darkMode : merged.darkMode;
 
-  ["title", "bio", "themeLabel"].forEach((field) => {
+  ["title", "bio"].forEach((field) => {
     if (savedData[field] && typeof savedData[field] === "object") {
       merged[field] = { ...merged[field], ...savedData[field] };
     }
   });
 
-  if (Array.isArray(savedData.links) && savedData.links.length > 0) {
-    merged.links = merged.links.map((link) => {
-      const nextLink = savedData.links.find((item) => item.key === link.key);
-      return nextLink ? { ...link, ...nextLink } : link;
-    });
-  }
+  merged.links = hydrateLinks(savedData.links, fallbackData.links);
 
   return merged;
 }
 
-function loadProfileData() {
-  try {
-    const rawData = window.localStorage.getItem(STORAGE_KEY);
-
-    if (!rawData) {
-      return cloneDefaultData();
-    }
-
-    return mergeProfileData(JSON.parse(rawData));
-  } catch (error) {
-    return cloneDefaultData();
-  }
+function loadProfiles() {
+  return readStorage(PROFILE_STORAGE_KEY, {});
 }
 
-function saveProfileData(data) {
-  const merged = mergeProfileData(data);
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+function saveProfiles(profiles) {
+  writeStorage(PROFILE_STORAGE_KEY, profiles);
+}
+
+function loadProfileData(username = "admin", name = "Demo Admin") {
+  const profiles = loadProfiles();
+  const base = buildDefaultProfile(username, name);
+  return mergeProfileData(profiles[username], base);
+}
+
+function saveProfileData(username, data, name = "Demo Admin") {
+  const profiles = loadProfiles();
+  const base = buildDefaultProfile(username, name);
+  const merged = mergeProfileData(data, base);
+  profiles[username] = merged;
+  saveProfiles(profiles);
   return merged;
 }
 
 window.profileStore = {
-  STORAGE_KEY,
+  PROFILE_STORAGE_KEY,
+  SOCIAL_PLATFORMS,
+  buildDefaultProfile,
+  createLink,
   defaultProfileData,
   loadProfileData,
   saveProfileData,
   mergeProfileData,
+  readStorage,
+  writeStorage,
 };

@@ -3,90 +3,180 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Arif | Sosyal Medya Kartı</title>
+    <title>sojial | Sakin bağlantı ve profil ağı</title>
     <meta
       name="description"
-      content="Arif için hazırlanmış kişisel sosyal medya bağlantı ekranı."
+      content="sojial ile kendi bağlantı sayfanı oluştur, kullanıcı adını al ve sade bir sosyal profil deneyimi kur."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
-    <main class="scene">
-      <div class="ambient ambient-left" aria-hidden="true"></div>
-      <div class="ambient ambient-right" aria-hidden="true"></div>
-      <div class="grain" aria-hidden="true"></div>
+  <body class="marketing-page">
+    <div class="page-aura page-aura-left" aria-hidden="true"></div>
+    <div class="page-aura page-aura-right" aria-hidden="true"></div>
 
-      <a class="admin-entry" href="admin.html">Yönetim Paneli</a>
+    <header class="topbar">
+      <a class="brandmark" href="index.html" aria-label="sojial ana sayfa">
+        <span class="brandmark-icon">◡</span>
+        <span class="brandmark-text">sojial</span>
+      </a>
 
-      <section class="profile-card" aria-label="Arif sosyal medya kartı">
-        <div class="profile-header">
-          <div class="avatar-ring">
-            <div class="avatar">A</div>
-          </div>
+      <nav class="topbar-actions" aria-label="Hızlı işlemler">
+        <button class="ghost-icon" type="button" id="theme-toggle" aria-label="Temayı değiştir">
+          ◐
+        </button>
+        <a class="pill-button ghost" href="login.html">Giriş yap</a>
+        <a class="pill-button solid" href="register.html">Üye ol</a>
+      </nav>
+    </header>
 
-          <div class="identity">
-            <p class="eyebrow">Kişisel Bağlantılar</p>
-            <h1>Arif</h1>
-            <p class="bio">
-              Tasarım, yazılım ve dijital üretim odaklı kişisel bağlantı ekranı.
-            </p>
-          </div>
-        </div>
+    <main class="landing-shell">
+      <section class="hero-block">
+        <p class="hero-kicker">Sosyal olmanın daha sakin hali</p>
+        <h1>Bugün seni buraya ne getirdi?</h1>
+        <p class="hero-copy">
+          Düşünceni paylaş, yardım iste, bağ kur veya keşfet. Profilini oluştur,
+          kullanıcı adını al ve dijital varlığını daha temiz bir yerden başlat.
+        </p>
+        <div class="hero-mark">♡</div>
 
-        <div class="links" aria-label="Sosyal medya bağlantıları">
-          <a class="social-link youtube" href="#" aria-label="YouTube profili" data-link="youtube">
-            <span class="icon">▶</span>
-            <span class="link-label">YouTube</span>
-          </a>
-
-          <a class="social-link instagram" href="#" aria-label="Instagram profili" data-link="instagram">
-            <span class="icon">◎</span>
-            <span class="link-label">Instagram</span>
-          </a>
-
-          <a class="social-link tiktok" href="#" aria-label="TikTok profili" data-link="tiktok">
-            <span class="icon">♪</span>
-            <span class="link-label">TikTok</span>
-          </a>
-
-          <a class="social-link x" href="#" aria-label="X profili" data-link="x">
-            <span class="icon">𝕏</span>
-            <span class="link-label">X (Twitter)</span>
-          </a>
-
-          <a class="social-link linkedin" href="#" aria-label="LinkedIn profili" data-link="linkedin">
-            <span class="icon">in</span>
-            <span class="link-label">LinkedIn</span>
-          </a>
-
-          <a class="social-link website" href="#" aria-label="Kişisel web sitesi" data-link="website">
-            <span class="icon">◌</span>
-            <span class="link-label">Web Sitem</span>
-          </a>
-        </div>
-
-        <div class="toolbar">
-          <div class="locale-switch" role="group" aria-label="Dil secimi">
-            <button class="locale is-active" type="button" data-lang="tr">TR</button>
-            <button class="locale" type="button" data-lang="en">EN</button>
-            <button class="locale" type="button" data-lang="de">DE</button>
-          </div>
-
-          <button class="theme-toggle" type="button" aria-pressed="false">
-            <span class="theme-icon">◐</span>
-            <span class="theme-label">Karanlık Tema</span>
+        <div class="composer">
+          <button class="composer-mode" type="button">
+            <span class="composer-badge">◌</span>
+            <span>Tartış</span>
+            <span class="composer-caret">⌄</span>
           </button>
+
+          <label class="composer-input">
+            <span class="sr-only">Paylaşım alanı</span>
+            <input
+              id="composer-field"
+              type="text"
+              placeholder="Düşünceni paylaş, bir sohbet başlat..."
+            />
+          </label>
+
+          <div class="composer-tools" aria-hidden="true">
+            <span>◫</span>
+            <span>⌲</span>
+            <span>☺</span>
+          </div>
+
+          <button class="pill-button composer-submit" type="button">Paylaş</button>
+        </div>
+
+        <div class="idea-strip">
+          <p>İlham lazım mı? Bunlardan biriyle başlayabilirsin</p>
+          <div class="idea-chips">
+            <button class="idea-chip" type="button">
+              <span class="idea-chip-icon">⌘</span>
+              <span>Benimle aynı ilgi alanlarını paylaşan insanlarla tanışmak istiyorum</span>
+            </button>
+            <button class="idea-chip" type="button">
+              <span class="idea-chip-icon">✦</span>
+              <span>Benim için önemli bir konuda fikir almak istiyorum</span>
+            </button>
+            <button class="idea-chip" type="button">
+              <span class="idea-chip-icon">⇄</span>
+              <span>Becerilerimle birine yardımcı olabilirim</span>
+            </button>
+            <button class="idea-chip" type="button">
+              <span class="idea-chip-icon">◎</span>
+              <span>Bulunduğum bölgede neler oluyor görmek istiyorum</span>
+            </button>
+            <button class="idea-chip centered" type="button">
+              <span class="idea-chip-icon">◌</span>
+              <span>Benim için anlamlı bir konuda konuşmak istiyorum</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="trust-row" aria-label="Platform avantajları">
+        <article class="trust-card">
+          <span class="trust-icon privacy">◍</span>
+          <div>
+            <h2>Gizliliğin önemli</h2>
+            <p>Neyi kimin göreceğine sen karar verirsin.</p>
+          </div>
+        </article>
+        <article class="trust-card">
+          <span class="trust-icon support">◌</span>
+          <div>
+            <h2>Gerçek insanlar, gerçek destek</h2>
+            <p>Seninle önemli olan şeylerin arasına algoritma girmez.</p>
+          </div>
+        </article>
+        <article class="trust-card">
+          <span class="trust-icon local">⌘</span>
+          <div>
+            <h2>Yerel ve global</h2>
+            <p>Mahallenden dünyaya uzanan sade bir bağ kurarsın.</p>
+          </div>
+        </article>
+        <article class="trust-card">
+          <span class="trust-icon purpose">✦</span>
+          <div>
+            <h2>Amaca uygun tasarım</h2>
+            <p>İlgi yerine niyeti ve insanı öne çıkaran bir deneyim.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="story-block">
+        <p class="hero-kicker">sojial neden farklı hissettiriyor?</p>
+        <h2>Sakin, özel, niyetli.</h2>
+        <p>
+          Çoğu sosyal ürün dikkati toplamak için tasarlanır. sojial ise insanların
+          net bir kimlik kurabilmesi, <strong>sojial.app/ariferhan</strong> gibi bir
+          adrese sahip olması ve kendini gürültüsüz şekilde paylaşabilmesi için var.
+        </p>
+      </section>
+
+      <section class="route-preview">
+        <div class="route-copy">
+          <p class="hero-kicker">Kişisel profil sayfaları</p>
+          <h2>Kendi adresini al.</h2>
+          <p>
+            Her kullanıcı kendi bio, link ve dijital duruşunu taşıyan temiz bir
+            profil sayfasına sahip olur. Basit kullanıcı adı. Direkt paylaşım.
+            Fazlalıksız bir görünüm.
+          </p>
+        </div>
+
+        <div class="route-card">
+          <div class="route-browser">
+            <span class="browser-dot"></span>
+            <span class="browser-dot"></span>
+            <span class="browser-dot"></span>
+            <span class="browser-address">sojial.app/ariferhan</span>
+          </div>
+          <div class="route-profile">
+            <div class="route-avatar">A</div>
+            <h3>Arif Erhan</h3>
+            <p>Üreten, tasarlayan ve interneti merak eden biri.</p>
+            <div class="route-links">
+              <span>YouTube</span>
+              <span>Instagram</span>
+              <span>Website</span>
+            </div>
+          </div>
         </div>
       </section>
     </main>
 
-    <script src="data.js"></script>
+    <footer class="site-footer">
+      <p>
+        redkit ajans tarafından oluşturulmuştur.
+        <a href="https://redkit.tr" target="_blank" rel="noreferrer">♥ redkit.tr</a>
+      </p>
+    </footer>
+
     <script src="script.js"></script>
   </body>
 </html>

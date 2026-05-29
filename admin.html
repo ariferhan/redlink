@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Arif | Yönetim Paneli</title>
+    <title>sojial | Kontrol paneli</title>
     <meta
       name="description"
-      content="Kişisel sosyal medya kartı için yönetim paneli."
+      content="sojial kullanıcıları için profil, bağlantı ve yayın paneli."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,202 +19,198 @@
   </head>
   <body>
     <main class="admin-shell">
-      <section class="admin-layout">
-        <div class="admin-panel">
-          <div class="admin-topbar">
+      <section class="dashboard-shell">
+        <header class="dashboard-header">
+          <div>
+            <p class="admin-kicker">Sojial kontrol paneli</p>
+            <h1>Kendi profilini oluştur</h1>
+            <p class="admin-copy">
+              Bio alanını doldur, sosyal medya kullanıcı adlarını ya da tam linklerini
+              ekle ve yayın adresini paylaş.
+            </p>
+          </div>
+
+          <div class="dashboard-header-actions">
+            <div class="session-banner">
+              <strong id="session-name">Demo Admin</strong>
+              <span id="session-username">@admin</span>
+            </div>
+            <a class="back-link" href="index.html">Ana sayfa</a>
+            <button class="back-link logout-button" id="logout-button" type="button">
+              Çıkış yap
+            </button>
+          </div>
+        </header>
+
+        <section class="dashboard-hero-cards">
+          <article class="hero-panel publish-panel">
             <div>
-              <p class="admin-kicker">Yönetim Paneli</p>
-              <h1>Sosyal Kart Düzenleyici</h1>
-              <p class="admin-copy">
-                Profil metinlerini, bağlantıları ve görünümü buradan yönetebilirsin.
+              <p class="hero-panel-label">Yayın adresin</p>
+              <h2 id="public-route">sojial.app/admin</h2>
+              <p id="public-route-subtitle">
+                Profilin yayınlandığında insanlar bu linkten seni ziyaret edecek.
               </p>
             </div>
 
-            <a class="back-link" href="index.html">Profil Ekranına Dön</a>
-          </div>
-
-          <form class="editor-form" id="editor-form">
-            <section class="form-card">
-              <div class="section-head">
-                <h2>Profil Bilgileri</h2>
-                <p>Ad, avatar harfi ve temel görünüm ayarları.</p>
-              </div>
-
-              <div class="field-grid">
-                <label class="field">
-                  <span>Ad Soyad / İsim</span>
-                  <input type="text" name="name" maxlength="32" />
-                </label>
-
-                <label class="field">
-                  <span>Avatar Harfi</span>
-                  <input type="text" name="avatarLetter" maxlength="2" />
-                </label>
-
-                <label class="field">
-                  <span>Aktif Dil</span>
-                  <select name="activeLanguage">
-                    <option value="tr">Türkçe</option>
-                    <option value="en">English</option>
-                    <option value="de">Deutsch</option>
-                  </select>
-                </label>
-
-                <label class="field toggle-field">
-                  <span>Koyu tema başlangıcı</span>
-                  <input type="checkbox" name="darkMode" />
-                </label>
-              </div>
-            </section>
-
-            <section class="form-card">
-              <div class="section-head">
-                <h2>Dil Metinleri</h2>
-                <p>Kart üzerindeki başlık, açıklama ve tema butonu metinleri.</p>
-              </div>
-
-              <div class="language-grid">
-                <div class="language-card">
-                  <h3>Türkçe</h3>
-                  <label class="field">
-                    <span>Üst Başlık</span>
-                    <input type="text" name="title-tr" />
-                  </label>
-                  <label class="field">
-                    <span>Açıklama</span>
-                    <textarea name="bio-tr" rows="3"></textarea>
-                  </label>
-                  <label class="field">
-                    <span>Tema Butonu</span>
-                    <input type="text" name="theme-tr" />
-                  </label>
-                </div>
-
-                <div class="language-card">
-                  <h3>English</h3>
-                  <label class="field">
-                    <span>Eyebrow</span>
-                    <input type="text" name="title-en" />
-                  </label>
-                  <label class="field">
-                    <span>Description</span>
-                    <textarea name="bio-en" rows="3"></textarea>
-                  </label>
-                  <label class="field">
-                    <span>Theme Button</span>
-                    <input type="text" name="theme-en" />
-                  </label>
-                </div>
-
-                <div class="language-card">
-                  <h3>Deutsch</h3>
-                  <label class="field">
-                    <span>Obere Başlık</span>
-                    <input type="text" name="title-de" />
-                  </label>
-                  <label class="field">
-                    <span>Beschreibung</span>
-                    <textarea name="bio-de" rows="3"></textarea>
-                  </label>
-                  <label class="field">
-                    <span>Thema Button</span>
-                    <input type="text" name="theme-de" />
-                  </label>
-                </div>
-              </div>
-            </section>
-
-            <section class="form-card">
-              <div class="section-head">
-                <h2>Bağlantılar</h2>
-                <p>Her butonun görünen adını ve hedef adresini güncelle.</p>
-              </div>
-
-              <div class="link-editor" id="link-editor"></div>
-            </section>
-
-            <div class="action-row">
-              <button class="action primary" type="submit">Kaydet ve Uygula</button>
-              <button class="action secondary" type="button" id="reset-button">
-                Varsayılanlara Dön
+            <div class="publish-actions">
+              <button class="action primary" id="copy-profile-link" type="button">
+                Linki kopyala
               </button>
-              <p class="status-message" id="status-message" aria-live="polite"></p>
+              <a class="action secondary" id="view-profile-link" href="profile.html?u=admin">
+                Profili görüntüle
+              </a>
             </div>
-          </form>
-        </div>
+          </article>
+        </section>
 
-        <aside class="preview-panel">
-          <div class="preview-head">
-            <p class="admin-kicker">Canlı Önizleme</p>
-            <h2>Yayınlanacak görünüm</h2>
-          </div>
-
-          <div class="scene preview-scene">
-            <div class="ambient ambient-left" aria-hidden="true"></div>
-            <div class="ambient ambient-right" aria-hidden="true"></div>
-            <div class="grain" aria-hidden="true"></div>
-
-            <section class="profile-card" id="preview-card">
-              <div class="profile-header">
-                <div class="avatar-ring">
-                  <div class="avatar" data-preview="avatar">A</div>
+        <section class="admin-layout">
+          <div class="admin-panel">
+            <form class="editor-form" id="editor-form">
+              <section class="form-card">
+                <div class="section-head">
+                  <h2>Kimlik bilgileri</h2>
+                  <p>Profil adı, kısa açıklama ve temel görünüm alanları.</p>
                 </div>
 
-                <div class="identity">
-                  <p class="eyebrow" data-preview="eyebrow">Kişisel Bağlantılar</p>
-                  <h2 data-preview="name">Arif</h2>
-                  <p class="bio" data-preview="bio">
-                    Tasarım, yazılım ve dijital üretim odaklı kişisel bağlantı ekranı.
+                <div class="field-grid">
+                  <label class="field">
+                    <span>Profil adı</span>
+                    <input type="text" name="name" maxlength="32" />
+                  </label>
+
+                  <label class="field">
+                    <span>Birincil dil</span>
+                    <select name="activeLanguage">
+                      <option value="tr">🇹🇷 Türkçe</option>
+                      <option value="en">🇬🇧 English</option>
+                      <option value="de">🇩🇪 Deutsch</option>
+                    </select>
+                  </label>
+                </div>
+              </section>
+
+              <section class="form-card">
+                <div class="section-head">
+                  <h2>Profil metinleri</h2>
+                  <p>Türkçe başlık ve açıklama alanlarını yönet.</p>
+                </div>
+
+                <div class="language-grid compact">
+                  <div class="language-card">
+                    <h3>Türkçe</h3>
+                    <label class="field">
+                      <span>Üst başlık</span>
+                      <input type="text" name="title-tr" />
+                    </label>
+                    <label class="field">
+                      <span>Açıklama</span>
+                      <textarea name="bio-tr" rows="4"></textarea>
+                    </label>
+                  </div>
+                </div>
+              </section>
+
+              <section class="form-card">
+                <div class="section-head">
+                  <h2>Sosyal bağlantılar</h2>
+                  <p>
+                    Her alan için kullanıcı adı ya da tam profil linki girebilirsin.
+                    Sistem uygun linki otomatik oluşturur.
                   </p>
                 </div>
-              </div>
 
-              <div class="links">
-                <a class="social-link youtube" data-preview-link="youtube" href="#">
-                  <span class="icon">▶</span>
-                  <span class="link-label">YouTube</span>
-                </a>
-                <a class="social-link instagram" data-preview-link="instagram" href="#">
-                  <span class="icon">◎</span>
-                  <span class="link-label">Instagram</span>
-                </a>
-                <a class="social-link tiktok" data-preview-link="tiktok" href="#">
-                  <span class="icon">♪</span>
-                  <span class="link-label">TikTok</span>
-                </a>
-                <a class="social-link x" data-preview-link="x" href="#">
-                  <span class="icon">𝕏</span>
-                  <span class="link-label">X (Twitter)</span>
-                </a>
-                <a class="social-link linkedin" data-preview-link="linkedin" href="#">
-                  <span class="icon">in</span>
-                  <span class="link-label">LinkedIn</span>
-                </a>
-                <a class="social-link website" data-preview-link="website" href="#">
-                  <span class="icon">◌</span>
-                  <span class="link-label">Web Sitem</span>
-                </a>
-              </div>
+                <div class="link-editor" id="link-editor"></div>
+                <button class="action secondary add-link-button" id="add-link-button" type="button">
+                  Yeni sosyal bağlantı ekle
+                </button>
+              </section>
 
-              <div class="toolbar">
-                <div class="locale-switch preview-locales">
-                  <button class="locale" type="button">TR</button>
-                  <button class="locale" type="button">EN</button>
-                  <button class="locale" type="button">DE</button>
+              <div class="action-row">
+                <button class="action primary" type="submit">Profili kaydet</button>
+                <button class="action secondary" type="button" id="reset-button">
+                  Varsayılanlara dön
+                </button>
+                <p class="status-message" id="status-message" aria-live="polite"></p>
+              </div>
+            </form>
+          </div>
+
+          <aside class="preview-panel">
+            <div class="preview-head">
+              <p class="admin-kicker">Canlı önizleme</p>
+              <h2>Paylaşılacak profil</h2>
+            </div>
+
+            <div class="scene preview-scene">
+              <div class="ambient ambient-left" aria-hidden="true"></div>
+              <div class="ambient ambient-right" aria-hidden="true"></div>
+              <div class="grain" aria-hidden="true"></div>
+
+              <section class="profile-card" id="preview-card">
+                <div class="profile-header">
+                  <div class="avatar-ring">
+                    <div class="avatar" data-preview="avatar">A</div>
+                  </div>
+
+                  <div class="identity">
+                    <p class="hero-kicker preview-kicker" data-preview="eyebrow">Kişisel Bağlantılar</p>
+                    <h2 data-preview="name">Demo Admin</h2>
+                    <p class="bio" data-preview="bio">
+                      Demo hesap için hazırlanmış sade profil ve bağlantı alanı.
+                    </p>
+                    <p class="preview-address" data-preview="address">sojial.app/admin</p>
+                  </div>
                 </div>
 
-                <button class="theme-toggle" type="button">
-                  <span class="theme-icon">◐</span>
-                  <span class="theme-label" data-preview="themeLabel">Karanlık Tema</span>
-                </button>
-              </div>
-            </section>
-          </div>
-        </aside>
+                <div class="links">
+                  <a class="social-link youtube" data-preview-link="youtube" href="#">
+                    <span class="icon">▶</span>
+                    <span class="link-label">YouTube</span>
+                  </a>
+                  <a class="social-link instagram" data-preview-link="instagram" href="#">
+                    <span class="icon">◎</span>
+                    <span class="link-label">Instagram</span>
+                  </a>
+                  <a class="social-link tiktok" data-preview-link="tiktok" href="#">
+                    <span class="icon">♪</span>
+                    <span class="link-label">TikTok</span>
+                  </a>
+                  <a class="social-link x" data-preview-link="x" href="#">
+                    <span class="icon">𝕏</span>
+                    <span class="link-label">X (Twitter)</span>
+                  </a>
+                  <a class="social-link linkedin" data-preview-link="linkedin" href="#">
+                    <span class="icon">in</span>
+                    <span class="link-label">LinkedIn</span>
+                  </a>
+                  <a class="social-link website" data-preview-link="website" href="#">
+                    <span class="icon">◌</span>
+                    <span class="link-label">Web Sitem</span>
+                  </a>
+                </div>
+                <div class="toolbar">
+                  <div class="locale-switch preview-locales">
+                    <button class="locale" type="button">TR</button>
+                    <button class="locale" type="button">EN</button>
+                    <button class="locale" type="button">DE</button>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </aside>
+        </section>
       </section>
     </main>
 
+    <footer class="site-footer">
+      <p>
+        redkit ajans tarafından oluşturulmuştur.
+        <a href="https://redkit.tr" target="_blank" rel="noreferrer">♥ redkit.tr</a>
+      </p>
+    </footer>
+
     <script src="data.js"></script>
+    <script src="auth.js"></script>
     <script src="admin.js"></script>
   </body>
 </html>

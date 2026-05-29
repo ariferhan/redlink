@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sojial | Giriş yap</title>
+    <meta name="description" content="sojial demo hesabına giriş yap." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="auth.css" />
+  </head>
+  <body class="auth-page">
+    <main class="auth-shell">
+      <a class="brandmark auth-brand" href="index.html" aria-label="sojial ana sayfa">
+        <span class="brandmark-icon">◡</span>
+        <span class="brandmark-text">sojial</span>
+      </a>
+
+      <section class="auth-card">
+        <div class="auth-copy-side">
+          <div>
+            <p class="hero-kicker">Hesabına geri dön</p>
+            <h1>Giriş yap</h1>
+            <p class="auth-copy">
+              Profilini, bağlantılarını ve sana ait sojial alanını yönetmek için
+              hesabına giriş yap.
+            </p>
+          </div>
+
+          <div class="auth-highlights">
+            <div class="auth-highlight">
+              <span class="auth-highlight-icon">◌</span>
+              <div>
+                <strong>Demo hesap hazır</strong>
+                <p>İlk deneme için sistemde önceden tanımlı bir yönetici hesabı var.</p>
+              </div>
+            </div>
+            <div class="auth-highlight">
+              <span class="auth-highlight-icon">⌘</span>
+              <div>
+                <strong>Kişisel profil adresi</strong>
+                <p>Girişten sonra kendi bağlantı sayfanı düzenlemeye başlayabilirsin.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="auth-form-side">
+          <div class="demo-badge">
+            <span>Demo giriş bilgileri</span>
+            <code>admin</code>
+            <code>admin</code>
+          </div>
+
+          <form id="login-form" class="auth-form">
+            <label class="field">
+              <span>Kullanıcı adı</span>
+              <input type="text" name="username" placeholder="admin" required />
+            </label>
+
+            <label class="field">
+              <span>Şifre</span>
+              <input type="password" name="password" placeholder="••••••••" required />
+            </label>
+
+            <button class="pill-button solid auth-submit" type="submit">Panele gir</button>
+            <p class="auth-message" id="auth-message" aria-live="polite"></p>
+          </form>
+
+          <p class="auth-switch">
+            Henüz hesabın yok mu? <a href="register.html">Üye ol</a>
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        redkit ajans tarafından oluşturulmuştur.
+        <a href="https://redkit.tr" target="_blank" rel="noreferrer">♥ redkit.tr</a>
+      </p>
+    </footer>
+
+    <script src="data.js"></script>
+    <script src="auth.js"></script>
+    <script src="auth-page.js"></script>
+  </body>
+</html>

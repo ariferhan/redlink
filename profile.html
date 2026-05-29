@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sojial | Profil</title>
+    <meta name="description" content="sojial herkese açık profil sayfası." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="scene">
+      <div class="ambient ambient-left" aria-hidden="true"></div>
+      <div class="ambient ambient-right" aria-hidden="true"></div>
+      <div class="grain" aria-hidden="true"></div>
+
+      <section class="profile-card" id="public-profile-card">
+        <div class="profile-header">
+          <div class="avatar-ring">
+            <div class="avatar" data-public="avatar">A</div>
+          </div>
+
+          <div class="identity">
+            <p class="hero-kicker" data-public="eyebrow">Kişisel Bağlantılar</p>
+            <h1 data-public="name">Profil</h1>
+            <p class="bio" data-public="bio">Bağlantılar birazdan burada görünecek.</p>
+            <p class="preview-address" data-public="address">sojial.app/profil</p>
+          </div>
+        </div>
+
+        <div class="links" id="public-links"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        redkit ajans tarafından oluşturulmuştur.
+        <a href="https://redkit.tr" target="_blank" rel="noreferrer">♥ redkit.tr</a>
+      </p>
+    </footer>
+
+    <script src="data.js"></script>
+    <script src="profile-page.js"></script>
+  </body>
+</html>
