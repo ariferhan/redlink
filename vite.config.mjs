@@ -7,8 +7,11 @@ const staticFiles = [
   "data.js",
   "auth.js",
   "auth-page.js",
+  "verify-page.js",
   "admin.js",
   "profile-page.js",
+  "supabase-config.js",
+  "supabase-service.js",
   ".htaccess",
 ];
 
@@ -40,6 +43,7 @@ export default defineConfig({
         admin: resolve(process.cwd(), "admin.html"),
         login: resolve(process.cwd(), "login.html"),
         register: resolve(process.cwd(), "register.html"),
+        verify: resolve(process.cwd(), "verify.html"),
         profile: resolve(process.cwd(), "profile.html"),
       },
     },
