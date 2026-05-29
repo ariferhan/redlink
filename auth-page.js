@@ -4,12 +4,6 @@ const authMessage = document.querySelector("#auth-message");
 const params = new URLSearchParams(window.location.search);
 const draftHint = document.querySelector("#draft-hint");
 
-const currentUser = window.authStore.getCurrentUser();
-
-if (currentUser) {
-  window.location.href = `admin.html?session=${currentUser.username}`;
-}
-
 function setMessage(message, isError = false) {
   if (!authMessage) {
     return;
@@ -19,60 +13,77 @@ function setMessage(message, isError = false) {
   authMessage.style.color = isError ? "#d64545" : "var(--muted)";
 }
 
-const draftFromQuery = params.get("draft");
+async function bootAuthPage() {
+  const currentUser = await window.authStore.getCurrentUser();
 
-if (draftHint && draftFromQuery) {
-  draftHint.hidden = false;
-  draftHint.textContent = `Başlamak istediğin konu: "${draftFromQuery}"`;
-}
+  if (currentUser) {
+    window.location.href = `admin.html?session=${currentUser.username}`;
+    return;
+  }
 
-if (loginForm) {
-  loginForm.addEventListener("submit", (event) => {
-    event.preventDefault();
+  const draftFromQuery = params.get("draft");
 
-    const username = loginForm.elements.username.value;
-    const password = loginForm.elements.password.value;
-    const result = window.authStore.loginUser(username, password);
+  if (draftHint && draftFromQuery) {
+    draftHint.hidden = false;
+    draftHint.textContent = `Başlamak istediğin konu: "${draftFromQuery}"`;
+  }
 
-    if (!result.ok) {
-      setMessage(result.message, true);
-      return;
-    }
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
 
-    setMessage("Giriş başarılı, panele yönlendiriliyorsun.");
-    window.location.href = `admin.html?session=${result.user.username}`;
-  });
-}
+      const identifier = loginForm.elements.identifier.value;
+      const password = loginForm.elements.password.value;
+      const result = await window.authStore.loginUser(identifier, password);
 
-if (registerForm) {
-  registerForm.addEventListener("submit", (event) => {
-    event.preventDefault();
+      if (!result.ok) {
+        setMessage(result.message, true);
+        return;
+      }
 
-    const result = window.authStore.registerUser({
-      name: registerForm.elements.name.value,
-      username: registerForm.elements.username.value,
-      password: registerForm.elements.password.value,
+      setMessage("Giriş başarılı, panele yönlendiriliyorsun.");
+      window.location.href = `admin.html?session=${result.user.username}`;
     });
+  }
 
-    if (!result.ok) {
+  if (registerForm) {
+    registerForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const result = await window.authStore.requestSignupCode({
+        name: registerForm.elements.name.value,
+        email: registerForm.elements.email.value,
+        username: registerForm.elements.username.value,
+        password: registerForm.elements.password.value,
+      });
+
+      if (!result.ok) {
+        setMessage(result.message, true);
+        return;
+      }
+
+      setMessage("Kod gönderildi. Şimdi e-postandaki doğrulama kodunu gir.");
+      const verifyUrl = `verify.html?mode=signup&email=${encodeURIComponent(
+        registerForm.elements.email.value.trim()
+      )}&username=${encodeURIComponent(registerForm.elements.username.value.trim())}`;
+      window.setTimeout(() => {
+        window.location.href = verifyUrl;
+      }, 700);
+    });
+  }
+
+  const queryUsername = params.get("username");
+  const queryPassword = params.get("password");
+
+  if (queryUsername && queryPassword) {
+    const result = await window.authStore.loginUser(queryUsername, queryPassword);
+
+    if (result.ok) {
+      window.location.href = `admin.html?session=${result.user.username}`;
+    } else {
       setMessage(result.message, true);
-      return;
     }
-
-    setMessage("Hesap oluşturuldu, yönetim paneline yönlendiriliyorsun.");
-    window.location.href = `admin.html?session=${result.user.username}`;
-  });
-}
-
-const queryUsername = params.get("username");
-const queryPassword = params.get("password");
-
-if (queryUsername && queryPassword) {
-  const result = window.authStore.loginUser(queryUsername, queryPassword);
-
-  if (result.ok) {
-    window.location.href = `admin.html?session=${result.user.username}`;
-  } else {
-    setMessage(result.message, true);
   }
 }
+
+bootAuthPage();

@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="admin.css" />
   </head>
-  <body>
+  <body class="admin-pending">
     <main class="admin-shell">
       <section class="dashboard-shell">
         <header class="dashboard-header">
@@ -32,8 +32,8 @@
 
           <div class="dashboard-header-actions">
             <div class="session-banner">
-              <strong id="session-name">Demo Admin</strong>
-              <span id="session-username">@admin</span>
+              <strong id="session-name">Profil yükleniyor</strong>
+              <span id="session-username">@hazirlaniyor</span>
             </div>
             <a class="back-link" href="index.html">Ana sayfa</a>
             <button class="back-link logout-button" id="logout-button" type="button">
@@ -46,7 +46,7 @@
           <article class="hero-panel publish-panel">
             <div>
               <p class="hero-panel-label">Yayın adresin</p>
-              <h2 id="public-route">sojial.app/admin</h2>
+              <h2 id="public-route">sojial.app/...</h2>
               <p id="public-route-subtitle">
                 Profilin yayınlandığında insanlar bu linkten seni ziyaret edecek.
               </p>
@@ -59,6 +59,9 @@
               <a class="action secondary" id="view-profile-link" href="profile.html?u=admin">
                 Profili görüntüle
               </a>
+              <button class="action secondary" id="download-qr-button" type="button">
+                SVG QR indir
+              </button>
             </div>
           </article>
         </section>
@@ -67,8 +70,56 @@
           <div class="admin-panel">
             <form class="editor-form" id="editor-form">
               <section class="form-card">
+                <div class="section-head section-head-inline">
+                  <h2><span class="section-icon">⚙</span> Hesap ayarları</h2>
+                  <p>E-posta, kullanıcı adı ve profil fotoğrafı ayarları.</p>
+                </div>
+
+                <div class="field-grid">
+                  <label class="field">
+                    <span>E-posta adresi</span>
+                    <input type="email" name="accountEmail" />
+                  </label>
+
+                  <label class="field">
+                    <span>Kullanıcı adı</span>
+                    <input type="text" name="accountUsername" maxlength="32" />
+                  </label>
+                </div>
+
+                <label class="field">
+                  <span>Mevcut şifre</span>
+                  <input type="password" name="currentPassword" placeholder="E-posta veya kullanıcı adı değişikliği için gerekli" />
+                </label>
+                <p class="account-note">
+                  E-posta veya kullanıcı adı değiştirirken mevcut şifreni doğruluyoruz.
+                </p>
+
+                <div class="avatar-settings">
+                  <div class="avatar-upload-card">
+                    <div class="avatar-upload-preview">
+                      <div class="avatar" data-settings="avatar">SA</div>
+                    </div>
+                    <div class="avatar-upload-copy">
+                      <strong>Profil fotoğrafı</strong>
+                      <p>Paylaşılacak profilin üst kısmında görünür. Fotoğraf yüklemezsen baş harflerin kullanılır.</p>
+                    </div>
+                  </div>
+                  <div class="avatar-upload-actions">
+                    <label class="action secondary upload-trigger">
+                      <input type="file" id="avatar-upload-input" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden />
+                      Fotoğraf yükle
+                    </label>
+                    <button class="action secondary" id="remove-avatar-button" type="button">
+                      Fotoğrafı kaldır
+                    </button>
+                  </div>
+                </div>
+              </section>
+
+              <section class="form-card">
                 <div class="section-head">
-                  <h2>Kimlik bilgileri</h2>
+                  <h2><span class="section-icon">✦</span> Kimlik bilgileri</h2>
                   <p>Profil adı, kısa açıklama ve temel görünüm alanları.</p>
                 </div>
 
@@ -91,7 +142,7 @@
 
               <section class="form-card">
                 <div class="section-head">
-                  <h2>Profil metinleri</h2>
+                  <h2><span class="section-icon">✎</span> Profil metinleri</h2>
                   <p>Türkçe başlık ve açıklama alanlarını yönet.</p>
                 </div>
 
@@ -112,7 +163,7 @@
 
               <section class="form-card">
                 <div class="section-head">
-                  <h2>Sosyal bağlantılar</h2>
+                  <h2><span class="section-icon">⌘</span> Sosyal bağlantılar</h2>
                   <p>
                     Her alan için kullanıcı adı ya da tam profil linki girebilirsin.
                     Sistem uygun linki otomatik oluşturur.
@@ -209,6 +260,9 @@
       </p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-service.js"></script>
     <script src="data.js"></script>
     <script src="auth.js"></script>
     <script src="admin.js"></script>

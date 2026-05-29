@@ -7,6 +7,7 @@ const composerModeLabel = composerModeButton?.querySelector("span:nth-child(2)")
 const ideaChips = document.querySelectorAll(".idea-chip");
 const primaryAuthLink = document.querySelector("#primary-auth-link");
 const secondaryAuthLink = document.querySelector("#secondary-auth-link");
+const logoutAuthButton = document.querySelector("#logout-auth-button");
 
 const THEME_KEY = "sojial-theme";
 const DRAFT_KEY = "sojial-composer-draft";
@@ -80,8 +81,8 @@ function loadTheme() {
   applyTheme(safeRead(THEME_KEY, "light"));
 }
 
-function hydrateAuthLinks() {
-  const currentUser = window.authStore?.getCurrentUser?.();
+async function hydrateAuthLinks() {
+  const currentUser = await window.authStore?.getCurrentUser?.();
 
   if (currentUser && primaryAuthLink && secondaryAuthLink) {
     primaryAuthLink.textContent = "Profilini görüntüle";
@@ -89,6 +90,12 @@ function hydrateAuthLinks() {
 
     secondaryAuthLink.textContent = "Panele dön";
     secondaryAuthLink.href = `admin.html?session=${currentUser.username}`;
+
+    if (logoutAuthButton) {
+      logoutAuthButton.classList.remove("is-hidden");
+    }
+  } else if (logoutAuthButton) {
+    logoutAuthButton.classList.add("is-hidden");
   }
 
   body.classList.remove("auth-pending");
@@ -129,6 +136,13 @@ ideaChips.forEach((chip) => {
     composerField.focus();
   });
 });
+
+if (logoutAuthButton) {
+  logoutAuthButton.addEventListener("click", async () => {
+    await window.authStore?.clearSession?.();
+    window.location.href = "index.html";
+  });
+}
 
 loadTheme();
 applyComposerMode(getComposerMode());

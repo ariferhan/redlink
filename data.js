@@ -3,6 +3,14 @@ const PROFILE_STORAGE_KEY = "sojial-profiles";
 window.__sojialMemoryStore = window.__sojialMemoryStore || {};
 
 const SOCIAL_PLATFORMS = {
+  profilePhoto: {
+    label: "Profil Fotoğrafı",
+    icon: "◍",
+    hint: "Sistem içi gizli alan",
+    buildUrl: (value) => value,
+    cleanValue: (value) => value,
+    hidden: true,
+  },
   website: {
     label: "Website",
     icon: "◌",
@@ -119,11 +127,11 @@ function createLink(id, platform, value = "#", label = null) {
 }
 
 function buildDefaultProfile(username = "admin", name = "Demo Admin") {
-  const initial = name.trim().charAt(0).toUpperCase() || username.trim().charAt(0).toUpperCase() || "A";
-
   return {
+    username,
     name,
-    avatarLetter: initial,
+    avatarLetter: "",
+    avatarImage: "",
     title: {
       tr: "Kişisel Bağlantılar",
       en: "Personal Links",
@@ -171,9 +179,10 @@ function hydrateLinks(links = [], fallbackLinks = defaultProfileData.links) {
 
 function mergeProfileData(savedData = {}, fallbackData = defaultProfileData) {
   const merged = cloneProfileData(fallbackData);
-
+  merged.username = savedData.username || merged.username;
   merged.name = savedData.name || merged.name;
   merged.avatarLetter = savedData.avatarLetter || merged.avatarLetter;
+  merged.avatarImage = savedData.avatarImage || merged.avatarImage;
   merged.activeLanguage = savedData.activeLanguage || merged.activeLanguage;
   merged.darkMode = typeof savedData.darkMode === "boolean" ? savedData.darkMode : merged.darkMode;
 
@@ -184,7 +193,6 @@ function mergeProfileData(savedData = {}, fallbackData = defaultProfileData) {
   });
 
   merged.links = hydrateLinks(savedData.links, fallbackData.links);
-
   return merged;
 }
 
@@ -196,13 +204,13 @@ function saveProfiles(profiles) {
   writeStorage(PROFILE_STORAGE_KEY, profiles);
 }
 
-function loadProfileData(username = "admin", name = "Demo Admin") {
+function loadProfileDataLocal(username = "admin", name = "Demo Admin") {
   const profiles = loadProfiles();
   const base = buildDefaultProfile(username, name);
   return mergeProfileData(profiles[username], base);
 }
 
-function saveProfileData(username, data, name = "Demo Admin") {
+function saveProfileDataLocal(username, data, name = "Demo Admin") {
   const profiles = loadProfiles();
   const base = buildDefaultProfile(username, name);
   const merged = mergeProfileData(data, base);
@@ -211,14 +219,95 @@ function saveProfileData(username, data, name = "Demo Admin") {
   return merged;
 }
 
+function mapRemoteProfile(remoteProfile, fallbackUsername, fallbackName) {
+  const base = buildDefaultProfile(remoteProfile?.username || fallbackUsername, remoteProfile?.display_name || fallbackName);
+
+  if (!remoteProfile) {
+    return base;
+  }
+
+  const rawLinks = (remoteProfile.profile_links || []).sort((a, b) => a.sort_order - b.sort_order);
+  const avatarLink = rawLinks.find((link) => link.platform === "profilePhoto");
+
+  return mergeProfileData(
+    {
+      username: remoteProfile.username,
+      name: remoteProfile.display_name,
+      avatarLetter: remoteProfile.avatar_letter,
+      avatarImage: avatarLink?.url || "",
+      activeLanguage: remoteProfile.active_language,
+      darkMode: remoteProfile.dark_mode,
+      title: {
+        tr: remoteProfile.title_tr,
+        en: remoteProfile.title_en,
+        de: remoteProfile.title_de,
+      },
+      bio: {
+        tr: remoteProfile.bio_tr,
+        en: remoteProfile.bio_en,
+        de: remoteProfile.bio_de,
+      },
+      links: rawLinks
+        .filter((link) => link.platform !== "profilePhoto")
+        .map((link) => ({
+          id: link.id,
+          platform: link.platform,
+          label: link.label,
+          url: link.url,
+          icon: link.icon,
+        })),
+    },
+    base
+  );
+}
+
+async function loadProfileData(username = "admin", name = "Demo Admin") {
+  if (window.supabaseService?.isReady()) {
+    const remoteProfile = await window.supabaseService.getProfileByUsername(username);
+    return mapRemoteProfile(remoteProfile, username, name);
+  }
+
+  return loadProfileDataLocal(username, name);
+}
+
+async function saveProfileData(username, data, name = "Demo Admin") {
+  if (window.supabaseService?.isReady()) {
+    const payload = mergeProfileData({ ...data, username }, buildDefaultProfile(username, name));
+    const avatarLink = payload.avatarImage
+      ? [
+          createLink(
+            payload.links.some((link) => link.id === "profile-photo") ? "profile-photo" : "profile-photo",
+            "profilePhoto",
+            payload.avatarImage,
+            "Profil Fotoğrafı"
+          ),
+        ]
+      : [];
+    payload.links = [...payload.links, ...avatarLink];
+    const result = await window.supabaseService.saveProfile(payload);
+
+    if (!result.ok) {
+      throw new Error(result.message || "Profil kaydedilemedi.");
+    }
+
+    const refreshed = await window.supabaseService.getProfileByUsername(username);
+    return mapRemoteProfile(refreshed, username, name);
+  }
+
+  return saveProfileDataLocal(username, data, name);
+}
+
 window.profileStore = {
   PROFILE_STORAGE_KEY,
   SOCIAL_PLATFORMS,
   buildDefaultProfile,
   createLink,
   defaultProfileData,
+  visiblePlatforms: Object.entries(SOCIAL_PLATFORMS).filter(([, meta]) => !meta.hidden),
   loadProfileData,
   saveProfileData,
+  loadProfileDataLocal,
+  saveProfileDataLocal,
   mergeProfileData,
   readStorage,
   writeStorage,

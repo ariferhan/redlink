@@ -70,6 +70,10 @@ body {
   justify-content: flex-end;
 }
 
+.admin-pending .dashboard-shell {
+  visibility: hidden;
+}
+
 .back-link {
   display: inline-flex;
   align-items: center;
@@ -121,7 +125,7 @@ body {
 }
 
 .publish-panel {
-  width: min(100%, 760px);
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -154,7 +158,13 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+}
+
+#public-route {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .admin-layout {
@@ -193,6 +203,16 @@ body {
 
 .section-head {
   margin-bottom: 18px;
+}
+
+.section-head-inline {
+  margin-bottom: 20px;
+}
+
+.section-icon {
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 0.96em;
 }
 
 .section-head h2 {
@@ -234,6 +254,55 @@ body {
 .field {
   display: grid;
   gap: 8px;
+}
+
+.account-note {
+  margin: 8px 0 0;
+  color: #6e7487;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.avatar-settings {
+  display: grid;
+  gap: 14px;
+}
+
+.avatar-upload-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid rgba(224, 230, 241, 0.9);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.avatar-upload-preview .avatar {
+  width: 78px;
+  height: 78px;
+  font-size: 1.28rem;
+}
+
+.avatar-upload-copy strong {
+  display: block;
+  color: #1d2538;
+}
+
+.avatar-upload-copy p {
+  margin: 6px 0 0;
+  color: #6e7487;
+  line-height: 1.6;
+}
+
+.avatar-upload-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.upload-trigger {
+  cursor: pointer;
 }
 
 .field span {
@@ -362,6 +431,17 @@ body {
   line-height: 1;
   letter-spacing: -0.05em;
   word-break: break-word;
+}
+
+@media (max-width: 1120px) {
+  .publish-panel {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .publish-actions {
+    flex-wrap: wrap;
+  }
 }
 
 .preview-kicker {

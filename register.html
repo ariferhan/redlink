@@ -59,14 +59,23 @@
             </label>
 
             <label class="field">
+              <span>E-posta</span>
+              <input type="email" name="email" placeholder="mail@adresin.com" required />
+            </label>
+
+            <label class="field">
               <span>Kullanıcı adı</span>
               <input type="text" name="username" placeholder="ariferhan" required />
             </label>
 
             <label class="field">
               <span>Şifre</span>
-              <input type="password" name="password" placeholder="Bir şifre belirle" required />
+              <input type="password" name="password" placeholder="Girişte kullanacağın şifre" required />
             </label>
+
+            <p class="field-help">
+              En az 12 karakter kullan. Kullanıcı adın, e-postan veya çok yaygın şifreler kabul edilmez.
+            </p>
 
             <button class="pill-button solid auth-submit" type="submit">Hesap oluştur</button>
             <p class="auth-message" id="auth-message" aria-live="polite"></p>
@@ -86,6 +95,9 @@
       </p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-service.js"></script>
     <script src="data.js"></script>
     <script src="auth.js"></script>
     <script src="auth-page.js"></script>

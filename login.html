@@ -59,8 +59,8 @@
 
           <form id="login-form" class="auth-form">
             <label class="field">
-              <span>Kullanıcı adı</span>
-              <input type="text" name="username" placeholder="admin" required />
+              <span>E-posta veya demo kullanıcı adı</span>
+              <input type="text" name="identifier" placeholder="admin veya mail@adresin.com" required />
             </label>
 
             <label class="field">
@@ -69,8 +69,9 @@
             </label>
 
             <button class="pill-button solid auth-submit" type="submit">Panele gir</button>
-            <p class="auth-message" id="auth-message" aria-live="polite"></p>
           </form>
+
+          <p class="auth-message" id="auth-message" aria-live="polite"></p>
 
           <p class="auth-switch">
             Henüz hesabın yok mu? <a href="register.html">Üye ol</a>
@@ -86,6 +87,9 @@
       </p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-service.js"></script>
     <script src="data.js"></script>
     <script src="auth.js"></script>
     <script src="auth-page.js"></script>

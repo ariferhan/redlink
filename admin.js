@@ -1,9 +1,3 @@
-const currentUser = window.authStore.requireAuth();
-
-if (!currentUser) {
-  throw new Error("Authentication required");
-}
-
 const form = document.querySelector("#editor-form");
 const resetButton = document.querySelector("#reset-button");
 const addLinkButton = document.querySelector("#add-link-button");
@@ -17,18 +11,16 @@ const publicRoute = document.querySelector("#public-route");
 const copyProfileLinkButton = document.querySelector("#copy-profile-link");
 const viewProfileLink = document.querySelector("#view-profile-link");
 const previewLocaleButtons = document.querySelectorAll(".preview-locales .locale");
+const downloadQrButton = document.querySelector("#download-qr-button");
+const avatarUploadInput = document.querySelector("#avatar-upload-input");
+const removeAvatarButton = document.querySelector("#remove-avatar-button");
+const settingsAvatar = document.querySelector('[data-settings="avatar"]');
 
-const platformEntries = Object.entries(window.profileStore.SOCIAL_PLATFORMS);
-let profileData = window.profileStore.loadProfileData(currentUser.username, currentUser.name);
-let editableLinks = [...profileData.links];
-
-if (sessionName) {
-  sessionName.textContent = currentUser.name;
-}
-
-if (sessionUsername) {
-  sessionUsername.textContent = `@${currentUser.username}`;
-}
+const platformEntries = window.profileStore.visiblePlatforms;
+let currentUser = null;
+let profileData = null;
+let editableLinks = [];
+let avatarImage = "";
 
 function getPublicProfileUrl() {
   if (window.location.protocol === "file:") {
@@ -42,8 +34,21 @@ function getDisplayRoute() {
   return `sojial.app/${currentUser.username}`;
 }
 
-function deriveAvatarLetter(name) {
-  return (name.trim().charAt(0) || currentUser.username.charAt(0) || "A").toUpperCase();
+function deriveInitials(name, fallback = currentUser?.username || "AA") {
+  const parts = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+
+  if (parts.length === 1 && parts[0].length >= 2) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+
+  return fallback.slice(0, 2).toUpperCase();
 }
 
 function getPlatformMeta(platform) {
@@ -52,26 +57,18 @@ function getPlatformMeta(platform) {
 
 function normalizeSocialUrl(platform, value) {
   const input = value.trim();
-
-  if (!input) {
-    return "#";
-  }
-
+  if (!input) return "#";
   return getPlatformMeta(platform).buildUrl(input);
 }
 
 function denormalizeSocialValue(platform, value) {
-  if (!value || value === "#") {
-    return "";
-  }
-
+  if (!value || value === "#") return "";
   return getPlatformMeta(platform).cleanValue(value);
 }
 
 function updateRouteUI() {
   const displayRoute = getDisplayRoute();
   const profileUrl = getPublicProfileUrl();
-
   publicRoute.textContent = displayRoute;
 
   if (viewProfileLink) {
@@ -149,20 +146,27 @@ function syncEditableLinksFromDOM() {
 
 function fillForm() {
   form.elements.name.value = profileData.name;
+  form.elements.accountEmail.value = currentUser.email || "";
+  form.elements.accountUsername.value = currentUser.username;
+  form.elements.currentPassword.value = "";
   form.elements.activeLanguage.value = profileData.activeLanguage;
   form.elements["title-tr"].value = profileData.title.tr;
   form.elements["bio-tr"].value = profileData.bio.tr;
+  avatarImage = profileData.avatarImage || "";
+  renderAvatarPreview(profileData.name);
 }
 
 function collectFormData() {
   syncEditableLinksFromDOM();
-
   const name = form.elements.name.value.trim() || currentUser.name;
+  const username = window.authStore.sanitizeUsername(form.elements.accountUsername.value) || currentUser.username;
 
   return window.profileStore.mergeProfileData(
     {
+      username,
       name,
-      avatarLetter: deriveAvatarLetter(name),
+      avatarLetter: deriveInitials(name, username),
+      avatarImage,
       activeLanguage: form.elements.activeLanguage.value,
       title: {
         tr: form.elements["title-tr"].value.trim() || profileData.title.tr,
@@ -176,8 +180,41 @@ function collectFormData() {
   );
 }
 
+function renderAvatarInto(element, data) {
+  element.classList.remove("has-image");
+  element.innerHTML = "";
+
+  if (data.avatarImage) {
+    const image = document.createElement("img");
+    image.src = data.avatarImage;
+    image.alt = `${data.name} profil fotoğrafı`;
+    element.appendChild(image);
+    element.classList.add("has-image");
+    return;
+  }
+
+  element.textContent = deriveInitials(data.name, data.username || currentUser.username);
+}
+
+function renderAvatarPreview(name) {
+  const draft = {
+    name,
+    username: form?.elements.accountUsername?.value?.trim() || currentUser?.username || "",
+    avatarImage,
+  };
+
+  if (settingsAvatar) {
+    renderAvatarInto(settingsAvatar, draft);
+  }
+
+  const previewAvatar = previewCard.querySelector('[data-preview="avatar"]');
+  if (previewAvatar) {
+    renderAvatarInto(previewAvatar, draft);
+  }
+}
+
 function renderPreview(data) {
-  previewCard.querySelector('[data-preview="avatar"]').textContent = deriveAvatarLetter(data.name);
+  renderAvatarInto(previewCard.querySelector('[data-preview="avatar"]'), data);
   previewCard.querySelector('[data-preview="name"]').textContent = data.name;
   const activeLanguage = data.activeLanguage || "tr";
   previewCard.querySelector('[data-preview="eyebrow"]').textContent = data.title[activeLanguage] || data.title.tr;
@@ -207,8 +244,9 @@ function renderPreview(data) {
   updateRouteUI();
 }
 
-function setStatus(message) {
+function setStatus(message, isError = false) {
   statusMessage.textContent = message;
+  statusMessage.style.color = isError ? "#d64545" : "";
 }
 
 function refreshLinkRowMeta(row) {
@@ -223,95 +261,196 @@ function refreshLinkRowMeta(row) {
   }
 }
 
-form.addEventListener("input", () => {
-  renderPreview(collectFormData());
-  setStatus("Önizleme güncellendi.");
-});
+async function saveProfile() {
+  try {
+    const draftData = collectFormData();
+    const accountResult = await window.authStore.updateAccountSettings({
+      currentUsername: currentUser.username,
+      email: form.elements.accountEmail.value,
+      username: draftData.username,
+      name: draftData.name,
+      currentPassword: form.elements.currentPassword.value,
+    });
 
-previewLocaleButtons.forEach((button, index) => {
-  button.addEventListener("click", () => {
-    const langs = ["tr", "en", "de"];
-    form.elements.activeLanguage.value = langs[index];
-    renderPreview(collectFormData());
-    setStatus("Birincil dil güncellendi.");
-  });
-});
+    if (!accountResult.ok) {
+      setStatus(accountResult.message, true);
+      return;
+    }
 
-linkEditor.addEventListener("change", (event) => {
-  const row = event.target.closest(".link-row");
-  if (!row) {
-    return;
-  }
-
-  if (event.target.dataset.role === "platform") {
-    refreshLinkRowMeta(row);
-  }
-
-  renderPreview(collectFormData());
-});
-
-linkEditor.addEventListener("click", (event) => {
-  const button = event.target.closest('[data-role="remove"]');
-  if (!button) {
-    return;
-  }
-
-  const row = button.closest(".link-row");
-  row.remove();
-  renderPreview(collectFormData());
-  setStatus("Bağlantı kaldırıldı.");
-});
-
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
-  profileData = window.profileStore.saveProfileData(currentUser.username, collectFormData(), currentUser.name);
-  editableLinks = [...profileData.links];
-  buildLinkEditor();
-  fillForm();
-  renderPreview(profileData);
-  setStatus("Profil kaydedildi. Linkin paylaşılmaya hazır.");
-});
-
-resetButton.addEventListener("click", () => {
-  const defaultData = window.profileStore.buildDefaultProfile(currentUser.username, currentUser.name);
-  profileData = window.profileStore.saveProfileData(currentUser.username, defaultData, currentUser.name);
-  editableLinks = [...profileData.links];
-  buildLinkEditor();
-  fillForm();
-  renderPreview(profileData);
-  setStatus("Varsayılan profil geri yüklendi.");
-});
-
-if (addLinkButton) {
-  addLinkButton.addEventListener("click", () => {
-    editableLinks.push(
-      window.profileStore.createLink(`link-${Date.now()}`, "telegram")
+    currentUser = accountResult.user;
+    profileData = await window.profileStore.saveProfileData(currentUser.username, draftData, currentUser.name);
+    editableLinks = [...profileData.links];
+    buildLinkEditor();
+    fillForm();
+    if (sessionName) sessionName.textContent = currentUser.name;
+    if (sessionUsername) sessionUsername.textContent = `@${currentUser.username}`;
+    form.elements.currentPassword.value = "";
+    window.history.replaceState({}, "", `admin.html?session=${currentUser.username}`);
+    renderPreview(profileData);
+    setStatus(
+      accountResult.emailChanged
+        ? "Profil kaydedildi. E-posta değişikliği yaptıysan onay mailini de kontrol et."
+        : "Profil kaydedildi. Linkin paylaşılmaya hazır."
     );
+  } catch (error) {
+    setStatus(error.message || "Profil kaydedilemedi.", true);
+  }
+}
+
+async function downloadQrSvg() {
+  try {
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?format=svg&size=512x512&data=${encodeURIComponent(
+      getPublicProfileUrl()
+    )}`;
+    const response = await fetch(qrUrl);
+
+    if (!response.ok) {
+      throw new Error("QR servisi yanıt vermedi.");
+    }
+
+    const svgMarkup = await response.text();
+    const blob = new Blob([svgMarkup], { type: "image/svg+xml" });
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = `${currentUser.username}-qr.svg`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(downloadUrl);
+    setStatus("QR kodu SVG olarak indirildi.");
+  } catch (error) {
+    setStatus("QR kodu oluşturulamadı.", true);
+  }
+}
+
+function readAvatarFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("Fotoğraf okunamadı."));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function initializeAdmin() {
+  currentUser = await window.authStore.requireAuth();
+
+  if (!currentUser) {
+    return;
+  }
+
+  profileData = await window.profileStore.loadProfileData(currentUser.username, currentUser.name);
+  editableLinks = [...profileData.links];
+
+  if (sessionName) sessionName.textContent = currentUser.name;
+  if (sessionUsername) sessionUsername.textContent = `@${currentUser.username}`;
+
+  buildLinkEditor();
+  fillForm();
+  renderPreview(profileData);
+  document.body.classList.remove("admin-pending");
+
+  form.addEventListener("input", () => {
+    renderAvatarPreview(form.elements.name.value.trim() || currentUser.name);
+    renderPreview(collectFormData());
+    setStatus("Önizleme güncellendi.");
+  });
+
+  previewLocaleButtons.forEach((button, index) => {
+    button.addEventListener("click", () => {
+      const langs = ["tr", "en", "de"];
+      form.elements.activeLanguage.value = langs[index];
+      renderPreview(collectFormData());
+      setStatus("Birincil dil güncellendi.");
+    });
+  });
+
+  linkEditor.addEventListener("change", (event) => {
+    const row = event.target.closest(".link-row");
+    if (!row) return;
+    if (event.target.dataset.role === "platform") {
+      refreshLinkRowMeta(row);
+    }
+    renderPreview(collectFormData());
+  });
+
+  linkEditor.addEventListener("click", (event) => {
+    const button = event.target.closest('[data-role="remove"]');
+    if (!button) return;
+    button.closest(".link-row").remove();
+    renderPreview(collectFormData());
+    setStatus("Bağlantı kaldırıldı.");
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await saveProfile();
+  });
+
+  resetButton.addEventListener("click", async () => {
+    const defaultData = window.profileStore.buildDefaultProfile(currentUser.username, currentUser.name);
+    profileData = await window.profileStore.saveProfileData(currentUser.username, defaultData, currentUser.name);
+    editableLinks = [...profileData.links];
+    buildLinkEditor();
+    fillForm();
+    renderPreview(profileData);
+    setStatus("Varsayılan profil geri yüklendi.");
+  });
+
+  addLinkButton.addEventListener("click", () => {
+    editableLinks.push(window.profileStore.createLink(`link-${Date.now()}`, "telegram"));
     buildLinkEditor();
     renderPreview(collectFormData());
     setStatus("Yeni sosyal bağlantı alanı eklendi.");
   });
-}
 
-if (copyProfileLinkButton) {
+  downloadQrButton?.addEventListener("click", downloadQrSvg);
+
   copyProfileLinkButton.addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(getPublicProfileUrl());
       setStatus("Profil linki panoya kopyalandı.");
     } catch (error) {
-      setStatus("Link kopyalanamadı. Tarayıcı izinlerini kontrol et.");
+      setStatus("Link kopyalanamadı. Tarayıcı izinlerini kontrol et.", true);
     }
   });
-}
 
-if (logoutButton) {
-  logoutButton.addEventListener("click", () => {
-    window.authStore.clearSession();
+  logoutButton.addEventListener("click", async () => {
+    await window.authStore.clearSession();
     window.location.href = "login.html";
+  });
+
+  avatarUploadInput?.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setStatus("Sadece görsel dosyaları yükleyebilirsin.", true);
+      return;
+    }
+
+    try {
+      avatarImage = await readAvatarFile(file);
+      renderPreview(collectFormData());
+      renderAvatarPreview(form.elements.name.value.trim() || currentUser.name);
+      setStatus("Profil fotoğrafı önizlemeye eklendi.");
+    } catch (error) {
+      setStatus(error.message || "Fotoğraf yüklenemedi.", true);
+    }
+  });
+
+  removeAvatarButton?.addEventListener("click", () => {
+    avatarImage = "";
+    if (avatarUploadInput) {
+      avatarUploadInput.value = "";
+    }
+    renderPreview(collectFormData());
+    renderAvatarPreview(form.elements.name.value.trim() || currentUser.name);
+    setStatus("Profil fotoğrafı kaldırıldı. Baş harfler gösterilecek.");
   });
 }
 
-editableLinks = [...profileData.links];
-buildLinkEditor();
-fillForm();
-renderPreview(profileData);
+initializeAdmin();
