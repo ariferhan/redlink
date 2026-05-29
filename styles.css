@@ -117,15 +117,19 @@ button {
 
 .topbar {
   position: sticky;
-  top: 0;
-  z-index: 10;
+  top: 14px;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 14px 28px;
+  width: min(100% - 32px, 1160px);
+  margin: 16px auto 0;
+  padding: 16px 24px;
   background: rgba(255, 255, 255, 0.72);
-  border-bottom: 1px solid var(--line);
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  border-radius: 26px;
+  box-shadow: 0 18px 42px rgba(31, 42, 78, 0.1);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
@@ -685,19 +689,138 @@ body.marketing-page.is-dark .pill-button.solid {
 .site-footer {
   position: relative;
   z-index: 1;
-  padding: 0 20px 24px;
-  text-align: center;
+  padding: 40px 20px 28px;
 }
 
-.site-footer p {
+.footer-shell {
+  width: min(100%, 1160px);
+  margin: 0 auto;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 34px;
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 24px 70px rgba(132, 143, 172, 0.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.footer-brand {
+  margin-bottom: 14px;
+}
+
+.footer-lead,
+.footer-col a,
+.footer-note,
+.footer-bottom p {
+  color: var(--muted);
+}
+
+.footer-lead,
+.footer-note {
+  line-height: 1.7;
+}
+
+.footer-col h3 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+}
+
+.footer-col-links {
+  display: grid;
+  gap: 10px;
+}
+
+.footer-col a {
+  font-weight: 600;
+}
+
+.footer-col a:hover,
+.site-footer a:hover {
+  color: var(--text);
+}
+
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.footer-bottom p {
   margin: 0;
-  color: var(--soft);
-  font-size: 0.88rem;
+  font-size: 0.9rem;
 }
 
-.site-footer a {
+.footer-socials {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-socials a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--muted);
+}
+
+.footer-note {
+  margin: 18px 0 0;
+  font-size: 0.84rem;
+}
+
+.footer-contact {
   color: var(--brand);
   font-weight: 800;
+}
+
+.legal-shell {
+  width: min(100% - 32px, 980px);
+  margin: 34px auto 0;
+  padding: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: 0 24px 70px rgba(132, 143, 172, 0.12);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.legal-shell h1 {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  letter-spacing: -0.06em;
+}
+
+.legal-shell h2 {
+  margin: 28px 0 10px;
+  font-size: 1.08rem;
+}
+
+.legal-shell p,
+.legal-shell li {
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.legal-shell ul {
+  margin: 0;
+  padding-left: 18px;
 }
 
 .ghost-icon:hover,
@@ -971,6 +1094,7 @@ body:not(.profile-pending) .profile-loader {
   .topbar {
     flex-wrap: wrap;
     justify-content: center;
+    width: min(100% - 20px, 1160px);
     padding: 14px 16px;
   }
 
@@ -1025,7 +1149,7 @@ body:not(.profile-pending) .profile-loader {
   }
 
   .site-footer {
-    padding: 4px 16px 20px;
+    padding: 18px 12px 20px;
   }
 }
 
@@ -1063,7 +1187,21 @@ body:not(.profile-pending) .profile-loader {
     min-height: 56px;
   }
 
-  .site-footer p {
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer-shell {
+    padding: 22px;
+  }
+
+  .footer-note,
+  .footer-bottom p {
     font-size: 0.8rem;
     line-height: 1.6;
   }
