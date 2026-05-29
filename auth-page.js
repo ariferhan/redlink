@@ -2,6 +2,7 @@ const loginForm = document.querySelector("#login-form");
 const registerForm = document.querySelector("#register-form");
 const authMessage = document.querySelector("#auth-message");
 const params = new URLSearchParams(window.location.search);
+const draftHint = document.querySelector("#draft-hint");
 
 const currentUser = window.authStore.getCurrentUser();
 
@@ -16,6 +17,13 @@ function setMessage(message, isError = false) {
 
   authMessage.textContent = message;
   authMessage.style.color = isError ? "#d64545" : "var(--muted)";
+}
+
+const draftFromQuery = params.get("draft");
+
+if (draftHint && draftFromQuery) {
+  draftHint.hidden = false;
+  draftHint.textContent = `Başlamak istediğin konu: "${draftFromQuery}"`;
 }
 
 if (loginForm) {

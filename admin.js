@@ -16,6 +16,7 @@ const sessionUsername = document.querySelector("#session-username");
 const publicRoute = document.querySelector("#public-route");
 const copyProfileLinkButton = document.querySelector("#copy-profile-link");
 const viewProfileLink = document.querySelector("#view-profile-link");
+const previewLocaleButtons = document.querySelectorAll(".preview-locales .locale");
 
 const platformEntries = Object.entries(window.profileStore.SOCIAL_PLATFORMS);
 let profileData = window.profileStore.loadProfileData(currentUser.username, currentUser.name);
@@ -178,8 +179,9 @@ function collectFormData() {
 function renderPreview(data) {
   previewCard.querySelector('[data-preview="avatar"]').textContent = deriveAvatarLetter(data.name);
   previewCard.querySelector('[data-preview="name"]').textContent = data.name;
-  previewCard.querySelector('[data-preview="eyebrow"]').textContent = data.title.tr;
-  previewCard.querySelector('[data-preview="bio"]').textContent = data.bio.tr;
+  const activeLanguage = data.activeLanguage || "tr";
+  previewCard.querySelector('[data-preview="eyebrow"]').textContent = data.title[activeLanguage] || data.title.tr;
+  previewCard.querySelector('[data-preview="bio"]').textContent = data.bio[activeLanguage] || data.bio.tr;
 
   const linksContainer = previewCard.querySelector(".links");
   linksContainer.innerHTML = "";
@@ -195,6 +197,11 @@ function renderPreview(data) {
       <span class="link-label">${link.label}</span>
     `;
     linksContainer.appendChild(element);
+  });
+
+  previewLocaleButtons.forEach((button, index) => {
+    const langs = ["tr", "en", "de"];
+    button.classList.toggle("is-active", langs[index] === activeLanguage);
   });
 
   updateRouteUI();
@@ -219,6 +226,15 @@ function refreshLinkRowMeta(row) {
 form.addEventListener("input", () => {
   renderPreview(collectFormData());
   setStatus("Önizleme güncellendi.");
+});
+
+previewLocaleButtons.forEach((button, index) => {
+  button.addEventListener("click", () => {
+    const langs = ["tr", "en", "de"];
+    form.elements.activeLanguage.value = langs[index];
+    renderPreview(collectFormData());
+    setStatus("Birincil dil güncellendi.");
+  });
 });
 
 linkEditor.addEventListener("change", (event) => {
