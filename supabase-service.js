@@ -83,6 +83,34 @@
     return { ok: true };
   }
 
+  function getResetPasswordRedirectUrl() {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    if (window.location.protocol === "file:") {
+      return new URL("reset-password.html", window.location.href).href;
+    }
+
+    return `${window.location.origin}/reset-password.html`;
+  }
+
+  async function requestPasswordReset(email) {
+    if (!client) {
+      return { ok: false, message: "Supabase yapılandırılmamış." };
+    }
+
+    const { error } = await client.auth.resetPasswordForEmail(email, {
+      redirectTo: getResetPasswordRedirectUrl(),
+    });
+
+    if (error) {
+      return { ok: false, message: error.message };
+    }
+
+    return { ok: true };
+  }
+
   async function verifyEmailOtp({ email, token }) {
     if (!client) {
       return { ok: false, message: "Supabase yapılandırılmamış." };
@@ -167,6 +195,20 @@
     }
 
     await client.auth.signOut();
+  }
+
+  async function updatePassword(password) {
+    if (!client) {
+      return { ok: false, message: "Supabase yapılandırılmamış." };
+    }
+
+    const { data, error } = await client.auth.updateUser({ password });
+
+    if (error) {
+      return { ok: false, message: error.message };
+    }
+
+    return { ok: true, user: data.user };
   }
 
   async function getProfileByUsername(username) {
@@ -575,8 +617,10 @@
     signInWithEmail,
     verifyCurrentPassword,
     sendEmailOtp,
+    requestPasswordReset,
     verifyEmailOtp,
     updateCurrentUser,
+    updatePassword,
     signUp,
     signOut,
     getProfileByUsername,

@@ -194,6 +194,15 @@ body.dark .auth-form-side {
   line-height: 1.5;
 }
 
+.auth-inline-link {
+  margin-top: -2px;
+}
+
+.auth-inline-link a {
+  color: var(--brand);
+  font-weight: 800;
+}
+
 .auth-form .field input {
   width: 100%;
   min-height: 60px;

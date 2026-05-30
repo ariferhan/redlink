@@ -385,6 +385,20 @@ async function requestLoginCode(email) {
   });
 }
 
+async function requestPasswordReset(email) {
+  if (!window.supabaseService?.isReady()) {
+    return { ok: false, message: "Şifre sıfırlama için önce Supabase bağlantısını kurman gerekiyor." };
+  }
+
+  const trimmedEmail = email.trim().toLowerCase();
+
+  if (!trimmedEmail) {
+    return { ok: false, message: "E-posta adresi gerekli." };
+  }
+
+  return window.supabaseService.requestPasswordReset(trimmedEmail);
+}
+
 async function requestSignupCode({ name, email, username, password }) {
   if (!window.supabaseService?.isReady()) {
     return { ok: false, message: "Kod ile üyelik için önce Supabase bağlantısını kurman gerekiyor." };
@@ -582,6 +596,37 @@ async function registerUser({ name, email, username, password }) {
   return { ok: true, user: newUser };
 }
 
+async function updatePasswordAfterRecovery(password) {
+  if (!window.supabaseService?.isReady()) {
+    return { ok: false, message: "Şifre güncellemek için önce Supabase bağlantısını kurman gerekiyor." };
+  }
+
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser?.email) {
+    return { ok: false, message: "Şifre yenileme oturumu bulunamadı. Maildeki bağlantıyı tekrar aç." };
+  }
+
+  const passwordValidation = validatePasswordPolicy({
+    password,
+    email: currentUser.email,
+    username: currentUser.username || "",
+    name: currentUser.name || "",
+  });
+
+  if (!passwordValidation.ok) {
+    return passwordValidation;
+  }
+
+  const result = await window.supabaseService.updatePassword(password);
+
+  if (!result.ok) {
+    return result;
+  }
+
+  return { ok: true, user: currentUser };
+}
+
 async function requireAuth(redirectUrl = "login.html") {
   const params = new URLSearchParams(window.location.search);
   const sessionUsername = params.get("session");
@@ -703,8 +748,10 @@ window.authStore = {
   readPendingSignup,
   updateAccountSettings,
   requestLoginCode,
+  requestPasswordReset,
   requestSignupCode,
   verifyEmailCode,
+  updatePasswordAfterRecovery,
   validatePasswordPolicy,
   canManageBlogs,
   listManagedUsers,
