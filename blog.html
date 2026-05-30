@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sojial | Blog</title>
+    <meta name="description" content="sojial blog yazıları ve ürün notları." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="marketing-page auth-pending">
+    <div class="page-aura page-aura-left" aria-hidden="true"></div>
+    <div class="page-aura page-aura-right" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <a class="brandmark" href="index.html" aria-label="sojial ana sayfa">
+        <span class="brandmark-icon" data-icon="brand" data-icon-size="28"></span>
+        <span class="brandmark-text">sojial</span>
+      </a>
+
+      <nav class="topbar-actions" id="topbar-actions" aria-label="Hızlı işlemler">
+        <a class="pill-button ghost" id="primary-auth-link" href="login.html">Giriş yap</a>
+        <a class="pill-button solid" id="secondary-auth-link" href="register.html">Üye ol</a>
+        <button class="pill-button ghost is-hidden" id="logout-auth-button" type="button">
+          Çıkış yap
+        </button>
+      </nav>
+    </header>
+
+    <main class="landing-shell">
+      <article class="blog-article" id="blog-article">
+        <p class="hero-kicker">sojial blog</p>
+        <div class="blog-article-meta">
+          <span class="blog-date" id="blog-date"></span>
+          <span class="blog-slug" id="blog-slug"></span>
+        </div>
+        <h1 id="blog-title">Yazı yükleniyor...</h1>
+        <p class="blog-article-excerpt" id="blog-excerpt"></p>
+        <div class="blog-article-cover is-hidden" id="blog-cover"></div>
+        <div class="blog-article-content" id="blog-content"></div>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-shell">
+        <div class="footer-grid">
+          <div class="footer-col">
+            <a class="brandmark footer-brand" href="index.html" aria-label="sojial ana sayfa">
+              <span class="brandmark-icon" data-icon="brand" data-icon-size="26"></span>
+              <span class="brandmark-text">sojial</span>
+            </a>
+            <p class="footer-lead">
+              sojial, kullanıcıların tüm sosyal medya ve web bağlantılarını tek bir kişisel
+              sayfada toplayabildiği sade bir dijital kartvizit altyapısıdır.
+            </p>
+          </div>
+
+          <div class="footer-col">
+            <h3>Ürün</h3>
+            <div class="footer-col-links">
+              <a href="register.html">Üye ol</a>
+              <a href="login.html">Giriş yap</a>
+              <a href="index.html#how-it-works">Nasıl çalışır</a>
+              <a href="index.html#blog-section">Blog</a>
+            </div>
+          </div>
+
+          <div class="footer-col">
+            <h3>Yasal</h3>
+            <div class="footer-col-links">
+              <a href="privacy.html">Gizlilik politikası</a>
+              <a href="kvkk.html">KVKK aydınlatma metni</a>
+              <a href="terms.html">Kullanım koşulları</a>
+            </div>
+          </div>
+
+          <div class="footer-col">
+            <h3>İletişim</h3>
+            <div class="footer-col-links">
+              <a class="footer-contact" href="mailto:noreply@sojial.app">noreply@sojial.app</a>
+              <a href="https://redkit.tr" target="_blank" rel="noreferrer">redkit ajans</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>© 2026 sojial. Tüm hakları saklıdır.</p>
+        </div>
+
+        <p class="footer-note">
+          sojial üzerinde paylaşılan bağlantıların ve blog içeriklerinin sorumluluğu ilgili kullanıcıya aittir.
+          Kaldırılmasını istediğin içerikler için
+          <a class="footer-contact" href="mailto:noreply@sojial.app">noreply@sojial.app</a>
+          adresine ulaşabilirsin.
+        </p>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-service.js"></script>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="auth.js"></script>
+    <script src="blog-page.js"></script>
+  </body>
+</html>

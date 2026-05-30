@@ -15,15 +15,30 @@ const downloadQrButton = document.querySelector("#download-qr-button");
 const avatarUploadInput = document.querySelector("#avatar-upload-input");
 const removeAvatarButton = document.querySelector("#remove-avatar-button");
 const settingsAvatar = document.querySelector('[data-settings="avatar"]');
+const blogAdminCard = document.querySelector("#blog-admin-card");
+const blogForm = document.querySelector("#blog-form");
+const blogSlugPreview = document.querySelector("#blog-slug-preview");
+const blogStatusMessage = document.querySelector("#blog-status-message");
+const blogList = document.querySelector("#blog-list");
+const blogCoverInput = document.querySelector("#blog-cover-input");
+const removeBlogCoverButton = document.querySelector("#remove-blog-cover-button");
+const resetBlogFormButton = document.querySelector("#reset-blog-form");
+const blogCoverPreview = document.querySelector("#blog-cover-preview");
 
 const platformEntries = window.profileStore.visiblePlatforms;
 let currentUser = null;
 let profileData = null;
 let editableLinks = [];
 let avatarImage = "";
+let blogPosts = [];
+let blogCoverImage = "";
 
 function renderIconMarkup(iconName, size = 18, className = "") {
   return window.sojialIcons?.renderIcon(iconName, { size, className }) || "";
+}
+
+function isAdminUser() {
+  return currentUser?.username === "admin";
 }
 
 function getPublicProfileUrl() {
@@ -36,6 +51,25 @@ function getPublicProfileUrl() {
 
 function getDisplayRoute() {
   return `sojial.app/${currentUser.username}`;
+}
+
+function getBlogHref(slug) {
+  return `blog.html?slug=${encodeURIComponent(slug)}`;
+}
+
+function formatBlogDate(date) {
+  return new Intl.DateTimeFormat("tr-TR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(date));
+}
+
+function formatBlogDateForInput(date) {
+  const value = new Date(date);
+  const offset = value.getTimezoneOffset();
+  const localDate = new Date(value.getTime() - offset * 60000);
+  return localDate.toISOString().slice(0, 10);
 }
 
 function deriveInitials(name, fallback = currentUser?.username || "AA") {
@@ -332,6 +366,147 @@ function readAvatarFile(file) {
   });
 }
 
+function setBlogStatus(message, isError = false) {
+  if (!blogStatusMessage) {
+    return;
+  }
+
+  blogStatusMessage.textContent = message;
+  blogStatusMessage.style.color = isError ? "#d64545" : "";
+}
+
+function renderBlogCoverPreview() {
+  if (!blogCoverPreview) {
+    return;
+  }
+
+  if (blogCoverImage) {
+    blogCoverPreview.classList.remove("is-empty");
+    blogCoverPreview.innerHTML = `<img src="${blogCoverImage}" alt="Blog kapak önizlemesi" />`;
+    return;
+  }
+
+  blogCoverPreview.classList.add("is-empty");
+  blogCoverPreview.innerHTML = renderIconMarkup("image", 26);
+}
+
+function updateBlogSlugPreview() {
+  if (!blogForm || !blogSlugPreview) {
+    return;
+  }
+
+  const title = blogForm.elements.blogTitle.value.trim();
+  const slug = window.profileStore.slugifyBlogTitle(title) || "blog-basligi";
+  blogSlugPreview.textContent = `/${slug}`;
+}
+
+function resetBlogForm(post = null) {
+  if (!blogForm) {
+    return;
+  }
+
+  blogForm.reset();
+  blogForm.elements.blogId.value = post?.id || "";
+  blogForm.elements.blogTitle.value = post?.title || "";
+  blogForm.elements.blogPublishedAt.value = post?.publishedAt ? formatBlogDateForInput(post.publishedAt) : formatBlogDateForInput(new Date().toISOString());
+  blogForm.elements.blogExcerpt.value = post?.excerpt || "";
+  blogForm.elements.blogContent.value = post?.content || "";
+  blogForm.elements.blogPublished.checked = post ? post.isPublished !== false : true;
+  blogCoverImage = post?.coverImage || "";
+
+  if (blogCoverInput) {
+    blogCoverInput.value = "";
+  }
+
+  renderBlogCoverPreview();
+  updateBlogSlugPreview();
+}
+
+function renderBlogList() {
+  if (!blogList) {
+    return;
+  }
+
+  if (!blogPosts.length) {
+    blogList.innerHTML = `<p class="blog-list-empty">Henüz kayıtlı blog yazısı yok.</p>`;
+    return;
+  }
+
+  blogList.innerHTML = blogPosts
+    .map(
+      (post) => `
+        <article class="blog-list-item" data-blog-id="${post.id}">
+          <div class="blog-list-item-cover${post.coverImage ? "" : " is-empty"}">
+            ${post.coverImage ? `<img src="${post.coverImage}" alt="${post.title} kapak görseli" />` : renderIconMarkup("text", 20)}
+          </div>
+          <div class="blog-list-item-copy">
+            <div class="blog-list-item-meta">
+              <span>${formatBlogDate(post.publishedAt)}</span>
+              <span>/${post.slug}</span>
+            </div>
+            <h3>${post.title}</h3>
+            <p>${post.excerpt || "Kısa özet eklenmedi."}</p>
+          </div>
+          <div class="blog-list-item-actions">
+            <a class="action secondary" href="${getBlogHref(post.slug)}" target="_blank" rel="noreferrer">Aç</a>
+            <button class="action secondary" type="button" data-role="edit-blog">Düzenle</button>
+            <button class="action secondary danger" type="button" data-role="delete-blog">Sil</button>
+          </div>
+        </article>
+      `
+    )
+    .join("");
+
+  window.sojialIcons?.mount(blogList);
+}
+
+function collectBlogFormData() {
+  const title = blogForm.elements.blogTitle.value.trim();
+  const excerpt = blogForm.elements.blogExcerpt.value.trim();
+  const content = blogForm.elements.blogContent.value.trim();
+
+  return window.profileStore.normalizeBlogPost({
+    id: blogForm.elements.blogId.value || undefined,
+    title,
+    slug: window.profileStore.slugifyBlogTitle(title),
+    excerpt,
+    content,
+    coverImage: blogCoverImage,
+    publishedAt: new Date(blogForm.elements.blogPublishedAt.value || new Date().toISOString()).toISOString(),
+    isPublished: blogForm.elements.blogPublished.checked,
+    authorUsername: currentUser.username,
+  });
+}
+
+async function loadBlogsForAdmin() {
+  if (!isAdminUser()) {
+    return;
+  }
+
+  blogPosts = await window.profileStore.listAdminBlogPosts();
+  renderBlogList();
+  resetBlogForm();
+}
+
+async function saveBlogPost() {
+  try {
+    const draft = collectBlogFormData();
+
+    if (!draft.title || !draft.content) {
+      setBlogStatus("Blog başlığı ve içerik zorunlu.", true);
+      return;
+    }
+
+    const savedPost = await window.profileStore.saveBlogPost(draft);
+    blogPosts = await window.profileStore.listAdminBlogPosts();
+    renderBlogList();
+    resetBlogForm(savedPost);
+    setBlogStatus("Blog yazısı kaydedildi.");
+  } catch (error) {
+    setBlogStatus(error.message || "Blog kaydedilemedi.", true);
+  }
+}
+
 async function initializeAdmin() {
   currentUser = await window.authStore.requireAuth();
 
@@ -349,6 +524,12 @@ async function initializeAdmin() {
   fillForm();
   renderPreview(profileData);
   window.sojialIcons?.mount(document);
+
+  if (isAdminUser()) {
+    blogAdminCard?.classList.remove("is-hidden");
+    await loadBlogsForAdmin();
+  }
+
   document.body.classList.remove("admin-pending");
 
   form.addEventListener("input", () => {
@@ -450,6 +631,81 @@ async function initializeAdmin() {
     renderPreview(collectFormData());
     renderAvatarPreview(form.elements.name.value.trim() || currentUser.name);
     setStatus("Profil fotoğrafı kaldırıldı. Baş harfler gösterilecek.");
+  });
+
+  blogForm?.addEventListener("input", (event) => {
+    if (event.target.name === "blogTitle") {
+      updateBlogSlugPreview();
+    }
+  });
+
+  blogForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await saveBlogPost();
+  });
+
+  resetBlogFormButton?.addEventListener("click", () => {
+    resetBlogForm();
+    setBlogStatus("Yeni blog taslağı hazır.");
+  });
+
+  blogCoverInput?.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setBlogStatus("Sadece görsel dosyaları yükleyebilirsin.", true);
+      return;
+    }
+
+    try {
+      blogCoverImage = await readAvatarFile(file);
+      renderBlogCoverPreview();
+      setBlogStatus("Blog görseli eklendi.");
+    } catch (error) {
+      setBlogStatus(error.message || "Görsel yüklenemedi.", true);
+    }
+  });
+
+  removeBlogCoverButton?.addEventListener("click", () => {
+    blogCoverImage = "";
+    if (blogCoverInput) {
+      blogCoverInput.value = "";
+    }
+    renderBlogCoverPreview();
+    setBlogStatus("Blog görseli kaldırıldı.");
+  });
+
+  blogList?.addEventListener("click", async (event) => {
+    const item = event.target.closest(".blog-list-item");
+    if (!item) {
+      return;
+    }
+
+    const targetId = item.dataset.blogId;
+
+    if (event.target.closest('[data-role="edit-blog"]')) {
+      const targetPost = blogPosts.find((post) => post.id === targetId);
+      if (targetPost) {
+        resetBlogForm(targetPost);
+        setBlogStatus("Blog yazısı düzenlemeye açıldı.");
+      }
+      return;
+    }
+
+    if (event.target.closest('[data-role="delete-blog"]')) {
+      try {
+        await window.profileStore.deleteBlogPost(targetId);
+        blogPosts = await window.profileStore.listAdminBlogPosts();
+        renderBlogList();
+        resetBlogForm();
+        setBlogStatus("Blog yazısı kaldırıldı.");
+      } catch (error) {
+        setBlogStatus(error.message || "Blog yazısı kaldırılamadı.", true);
+      }
+    }
   });
 }
 

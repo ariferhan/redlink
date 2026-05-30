@@ -1,4 +1,5 @@
 const PROFILE_STORAGE_KEY = "sojial-profiles";
+const BLOG_STORAGE_KEY = "sojial-blog-posts";
 
 window.__sojialMemoryStore = window.__sojialMemoryStore || {};
 
@@ -204,6 +205,83 @@ function saveProfiles(profiles) {
   writeStorage(PROFILE_STORAGE_KEY, profiles);
 }
 
+function slugifyBlogTitle(value = "") {
+  return value
+    .toLocaleLowerCase("tr-TR")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-");
+}
+
+function normalizeBlogPost(post = {}) {
+  const title = (post.title || "").trim();
+  const excerpt = (post.excerpt || "").trim();
+  const content = (post.content || "").trim();
+  const slug = slugifyBlogTitle(post.slug || title);
+
+  return {
+    id: post.id || `blog-${Date.now()}`,
+    title,
+    slug,
+    excerpt,
+    content,
+    coverImage: post.coverImage || "",
+    publishedAt: post.publishedAt || new Date().toISOString(),
+    isPublished: post.isPublished !== false,
+    createdAt: post.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    authorUsername: post.authorUsername || "admin",
+  };
+}
+
+function sortBlogPosts(posts = []) {
+  return [...posts].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+}
+
+function loadBlogsLocal() {
+  return sortBlogPosts(readStorage(BLOG_STORAGE_KEY, []));
+}
+
+function saveBlogsLocal(posts) {
+  writeStorage(BLOG_STORAGE_KEY, sortBlogPosts(posts));
+}
+
+function ensureUniqueBlogSlug(slug, posts, excludeId = null) {
+  let nextSlug = slug || `blog-${Date.now()}`;
+  let counter = 2;
+
+  while (posts.some((post) => post.slug === nextSlug && post.id !== excludeId)) {
+    nextSlug = `${slug}-${counter}`;
+    counter += 1;
+  }
+
+  return nextSlug;
+}
+
+function saveBlogPostLocal(post) {
+  const posts = loadBlogsLocal();
+  const normalized = normalizeBlogPost(post);
+  normalized.slug = ensureUniqueBlogSlug(normalized.slug, posts, normalized.id);
+
+  const nextPosts = posts.some((item) => item.id === normalized.id)
+    ? posts.map((item) => (item.id === normalized.id ? { ...item, ...normalized } : item))
+    : [normalized, ...posts];
+
+  saveBlogsLocal(nextPosts);
+  return normalized;
+}
+
+function deleteBlogPostLocal(id) {
+  const nextPosts = loadBlogsLocal().filter((post) => post.id !== id);
+  saveBlogsLocal(nextPosts);
+}
+
+function getBlogPostBySlugLocal(slug) {
+  return loadBlogsLocal().find((post) => post.slug === slug) || null;
+}
+
 function loadProfileDataLocal(username = "admin", name = "Demo Admin") {
   const profiles = loadProfiles();
   const base = buildDefaultProfile(username, name);
@@ -306,7 +384,76 @@ async function saveProfileData(username, data, name = "Demo Admin") {
   return saveProfileDataLocal(username, data, name);
 }
 
+async function listPublishedBlogPosts(limit = 12) {
+  if (window.supabaseService?.isReady()) {
+    const remotePosts = await window.supabaseService.listPublishedBlogs(limit);
+    if (Array.isArray(remotePosts) && remotePosts.length > 0) {
+      return remotePosts.map(normalizeBlogPost);
+    }
+  }
+
+  return loadBlogsLocal()
+    .filter((post) => post.isPublished)
+    .slice(0, limit);
+}
+
+async function listAdminBlogPosts() {
+  if (window.supabaseService?.isReady()) {
+    const remotePosts = await window.supabaseService.listBlogsForAdmin();
+    if (Array.isArray(remotePosts) && remotePosts.length > 0) {
+      return remotePosts.map(normalizeBlogPost);
+    }
+  }
+
+  return loadBlogsLocal();
+}
+
+async function getBlogPostBySlug(slug) {
+  if (window.supabaseService?.isReady()) {
+    const remotePost = await window.supabaseService.getBlogBySlug(slug);
+    if (remotePost) {
+      return normalizeBlogPost(remotePost);
+    }
+  }
+
+  return getBlogPostBySlugLocal(slug);
+}
+
+async function saveBlogPost(post) {
+  const normalized = normalizeBlogPost(post);
+
+  if (window.supabaseService?.isReady()) {
+    const result = await window.supabaseService.saveBlog(normalized);
+    if (result?.ok && result.post) {
+      return normalizeBlogPost(result.post);
+    }
+
+    if (result?.message && !/blog_posts|relation/i.test(result.message)) {
+      throw new Error(result.message);
+    }
+  }
+
+  return saveBlogPostLocal(normalized);
+}
+
+async function deleteBlogPost(id) {
+  if (window.supabaseService?.isReady()) {
+    const result = await window.supabaseService.deleteBlog(id);
+    if (result?.ok) {
+      return true;
+    }
+
+    if (result?.message && !/blog_posts|relation/i.test(result.message)) {
+      throw new Error(result.message);
+    }
+  }
+
+  deleteBlogPostLocal(id);
+  return true;
+}
+
 window.profileStore = {
+  BLOG_STORAGE_KEY,
   PROFILE_STORAGE_KEY,
   SOCIAL_PLATFORMS,
   buildDefaultProfile,
@@ -316,6 +463,13 @@ window.profileStore = {
   loadProfileData,
   loadPublicProfileData,
   saveProfileData,
+  slugifyBlogTitle,
+  normalizeBlogPost,
+  listPublishedBlogPosts,
+  listAdminBlogPosts,
+  getBlogPostBySlug,
+  saveBlogPost,
+  deleteBlogPost,
   loadProfileDataLocal,
   saveProfileDataLocal,
   mergeProfileData,

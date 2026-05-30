@@ -184,6 +184,88 @@
                 <p class="status-message" id="status-message" aria-live="polite"></p>
               </div>
             </form>
+
+            <section class="form-card blog-admin-card is-hidden" id="blog-admin-card">
+              <div class="section-head">
+                <h2><span class="section-icon" data-icon="text" data-icon-size="18"></span> Blog yönetimi</h2>
+                <p>
+                  Sadece admin hesabında görünür. Blog yazısı ekle, görsel yükle ve anasayfadaki
+                  blog alanına otomatik taşı.
+                </p>
+              </div>
+
+              <form class="blog-form" id="blog-form">
+                <input type="hidden" name="blogId" />
+
+                <div class="field-grid">
+                  <label class="field">
+                    <span>Blog başlığı</span>
+                    <input type="text" name="blogTitle" maxlength="120" />
+                  </label>
+
+                  <label class="field">
+                    <span>Yayın tarihi</span>
+                    <input type="date" name="blogPublishedAt" />
+                  </label>
+                </div>
+
+                <div class="blog-slug-preview">
+                  <strong>Bağlantı:</strong>
+                  <span id="blog-slug-preview">/blog-basligi</span>
+                </div>
+
+                <label class="field">
+                  <span>Kısa özet</span>
+                  <textarea name="blogExcerpt" rows="3"></textarea>
+                </label>
+
+                <label class="field">
+                  <span>İçerik</span>
+                  <textarea name="blogContent" rows="10"></textarea>
+                </label>
+
+                <div class="blog-cover-card">
+                  <div class="blog-cover-preview is-empty" id="blog-cover-preview">
+                    <span data-icon="image" data-icon-size="26"></span>
+                  </div>
+                  <div class="blog-cover-copy">
+                    <strong>Kapak görseli</strong>
+                    <p>Blog kartlarında ve yazı detayında sabit oranlı görsel olarak gösterilir.</p>
+                  </div>
+                </div>
+
+                <div class="avatar-upload-actions">
+                  <label class="action secondary upload-trigger">
+                    <input type="file" id="blog-cover-input" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden />
+                    Görsel yükle
+                  </label>
+                  <button class="action secondary" id="remove-blog-cover-button" type="button">
+                    Görseli kaldır
+                  </button>
+                </div>
+
+                <label class="checkbox-row">
+                  <input type="checkbox" name="blogPublished" checked />
+                  <span>Bu yazıyı anasayfada ve detay sayfasında yayına al</span>
+                </label>
+
+                <div class="action-row blog-action-row">
+                  <button class="action primary" type="submit">Blogu kaydet</button>
+                  <button class="action secondary" type="button" id="reset-blog-form">
+                    Yeni yazı
+                  </button>
+                  <p class="status-message" id="blog-status-message" aria-live="polite"></p>
+                </div>
+              </form>
+
+              <div class="blog-manager-list">
+                <div class="section-head section-head-inline">
+                  <h2><span class="section-icon" data-icon="copy" data-icon-size="18"></span> Kayıtlı yazılar</h2>
+                  <p>Başlıktan otomatik slug üretilir. Düzenle veya kaldır.</p>
+                </div>
+                <div class="blog-list" id="blog-list"></div>
+              </div>
+            </section>
           </div>
 
           <aside class="preview-panel">

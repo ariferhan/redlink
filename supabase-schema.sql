@@ -74,6 +74,22 @@ for each row execute procedure public.handle_new_user_profile();
 alter table public.profiles enable row level security;
 alter table public.profile_links enable row level security;
 
+create table if not exists public.blog_posts (
+  id uuid primary key default gen_random_uuid(),
+  slug text unique not null,
+  title text not null,
+  excerpt text not null default '',
+  content text not null default '',
+  cover_image text not null default '',
+  published_at timestamptz not null default now(),
+  is_published boolean not null default true,
+  author_username text not null default 'admin',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.blog_posts enable row level security;
+
 drop policy if exists "public profiles are viewable" on public.profiles;
 create policy "public profiles are viewable"
 on public.profiles for select
@@ -105,5 +121,35 @@ with check (
     select 1 from public.profiles
     where public.profiles.id = profile_links.profile_id
       and public.profiles.id = auth.uid()
+  )
+);
+
+drop policy if exists "public blog posts are viewable" on public.blog_posts;
+create policy "public blog posts are viewable"
+on public.blog_posts for select
+using (
+  is_published = true
+  or exists (
+    select 1 from public.profiles
+    where public.profiles.id = auth.uid()
+      and public.profiles.username = 'admin'
+  )
+);
+
+drop policy if exists "admin manages blog posts" on public.blog_posts;
+create policy "admin manages blog posts"
+on public.blog_posts for all
+using (
+  exists (
+    select 1 from public.profiles
+    where public.profiles.id = auth.uid()
+      and public.profiles.username = 'admin'
+  )
+)
+with check (
+  exists (
+    select 1 from public.profiles
+    where public.profiles.id = auth.uid()
+      and public.profiles.username = 'admin'
   )
 );

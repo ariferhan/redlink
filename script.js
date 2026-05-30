@@ -8,6 +8,8 @@ const ideaChips = document.querySelectorAll(".idea-chip");
 const primaryAuthLink = document.querySelector("#primary-auth-link");
 const secondaryAuthLink = document.querySelector("#secondary-auth-link");
 const logoutAuthButton = document.querySelector("#logout-auth-button");
+const blogRail = document.querySelector("#blog-rail");
+const blogEmpty = document.querySelector("#blog-empty");
 
 const THEME_KEY = "sojial-theme";
 const DRAFT_KEY = "sojial-composer-draft";
@@ -75,6 +77,10 @@ function cycleComposerMode() {
 }
 
 function submitComposerIntent() {
+  if (!composerField) {
+    return;
+  }
+
   const draft = composerField?.value.trim() || "";
   const mode = getComposerMode();
   safeWrite(DRAFT_KEY, JSON.stringify({ mode: mode.id, draft }));
@@ -106,6 +112,57 @@ async function hydrateAuthLinks() {
 
   body.classList.remove("auth-pending");
   window.sojialIcons?.mount(document);
+}
+
+function formatBlogDate(date) {
+  return new Intl.DateTimeFormat("tr-TR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(date));
+}
+
+function getBlogHref(slug) {
+  return `blog.html?slug=${encodeURIComponent(slug)}`;
+}
+
+function renderBlogCard(post) {
+  const article = document.createElement("article");
+  article.className = "blog-card";
+  article.innerHTML = `
+    <a class="blog-card-link" href="${getBlogHref(post.slug)}">
+      <div class="blog-card-media${post.coverImage ? "" : " is-empty"}">
+        ${post.coverImage ? `<img src="${post.coverImage}" alt="${post.title} kapak görseli" />` : `<span data-icon="text" data-icon-size="24"></span>`}
+      </div>
+      <div class="blog-card-copy">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">${formatBlogDate(post.publishedAt)}</span>
+          <span class="blog-card-slug">/${post.slug}</span>
+        </div>
+        <h3>${post.title}</h3>
+        <p>${post.excerpt || "Bu yazıyı okumak için içeri gir."}</p>
+      </div>
+    </a>
+  `;
+  return article;
+}
+
+async function hydrateBlogs() {
+  if (!blogRail) {
+    return;
+  }
+
+  const posts = await window.profileStore.listPublishedBlogPosts(12);
+  blogRail.innerHTML = "";
+
+  if (!posts.length) {
+    blogEmpty?.classList.remove("is-hidden");
+    return;
+  }
+
+  blogEmpty?.classList.add("is-hidden");
+  posts.forEach((post) => blogRail.appendChild(renderBlogCard(post)));
+  window.sojialIcons?.mount(blogRail);
 }
 
 if (themeToggle) {
@@ -154,3 +211,4 @@ if (logoutAuthButton) {
 loadTheme();
 applyComposerMode(getComposerMode());
 hydrateAuthLinks();
+hydrateBlogs();

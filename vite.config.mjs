@@ -10,9 +10,11 @@ const staticFiles = [
   "verify-page.js",
   "admin.js",
   "profile-page.js",
+  "blog-page.js",
   "supabase-config.js",
   "supabase-service.js",
   "icons.js",
+  "qr-tools.js",
   ".htaccess",
 ];
 
@@ -46,6 +48,7 @@ export default defineConfig({
         register: resolve(process.cwd(), "register.html"),
         verify: resolve(process.cwd(), "verify.html"),
         profile: resolve(process.cwd(), "profile.html"),
+        blog: resolve(process.cwd(), "blog.html"),
         privacy: resolve(process.cwd(), "privacy.html"),
         kvkk: resolve(process.cwd(), "kvkk.html"),
         terms: resolve(process.cwd(), "terms.html"),

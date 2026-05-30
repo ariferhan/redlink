@@ -308,6 +308,146 @@
     return { ok: true };
   }
 
+  async function isCurrentAdmin() {
+    const user = await getUser();
+
+    if (!user) {
+      return false;
+    }
+
+    const profile = await getProfileForCurrentUser();
+    const username = profile?.username || user.user_metadata?.username || user.email?.split("@")[0] || "";
+    return username === "admin";
+  }
+
+  async function listPublishedBlogs(limit = 12) {
+    if (!client) {
+      return [];
+    }
+
+    const { data, error } = await client
+      .from("blog_posts")
+      .select("*")
+      .eq("is_published", true)
+      .order("published_at", { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      return [];
+    }
+
+    return data || [];
+  }
+
+  async function listBlogsForAdmin() {
+    if (!client) {
+      return [];
+    }
+
+    const admin = await isCurrentAdmin();
+
+    if (!admin) {
+      return [];
+    }
+
+    const { data, error } = await client.from("blog_posts").select("*").order("published_at", { ascending: false });
+
+    if (error) {
+      return [];
+    }
+
+    return data || [];
+  }
+
+  async function getBlogBySlug(slug) {
+    if (!client) {
+      return null;
+    }
+
+    const admin = await isCurrentAdmin();
+    let query = client.from("blog_posts").select("*").eq("slug", slug).limit(1);
+
+    if (!admin) {
+      query = query.eq("is_published", true);
+    }
+
+    const { data, error } = await query.single();
+
+    if (error) {
+      return null;
+    }
+
+    return data;
+  }
+
+  async function saveBlog(post) {
+    if (!client) {
+      return { ok: false, message: "Supabase yapılandırılmamış." };
+    }
+
+    const admin = await isCurrentAdmin();
+
+    if (!admin) {
+      return { ok: false, message: "Blog yönetimi için admin hesabı gerekiyor." };
+    }
+
+    const payload = {
+      id: post.id,
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt,
+      content: post.content,
+      cover_image: post.coverImage || "",
+      published_at: post.publishedAt,
+      is_published: Boolean(post.isPublished),
+      author_username: post.authorUsername || "admin",
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await client.from("blog_posts").upsert(payload).select("*").single();
+
+    if (error) {
+      return { ok: false, message: error.message };
+    }
+
+    return {
+      ok: true,
+      post: {
+        id: data.id,
+        slug: data.slug,
+        title: data.title,
+        excerpt: data.excerpt,
+        content: data.content,
+        coverImage: data.cover_image || "",
+        publishedAt: data.published_at,
+        isPublished: data.is_published,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+        authorUsername: data.author_username,
+      },
+    };
+  }
+
+  async function deleteBlog(id) {
+    if (!client) {
+      return { ok: false, message: "Supabase yapılandırılmamış." };
+    }
+
+    const admin = await isCurrentAdmin();
+
+    if (!admin) {
+      return { ok: false, message: "Blog yönetimi için admin hesabı gerekiyor." };
+    }
+
+    const { error } = await client.from("blog_posts").delete().eq("id", id);
+
+    if (error) {
+      return { ok: false, message: error.message };
+    }
+
+    return { ok: true };
+  }
+
   window.supabaseService = {
     isReady() {
       return Boolean(client);
@@ -325,5 +465,10 @@
     getProfileByUsername,
     getProfileForCurrentUser,
     saveProfile,
+    listPublishedBlogs,
+    listBlogsForAdmin,
+    getBlogBySlug,
+    saveBlog,
+    deleteBlog,
   };
 })();
