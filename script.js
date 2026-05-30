@@ -111,21 +111,31 @@ function applySignedInActions(user) {
 
 function hydrateAuthLinksSync() {
   const sessionUser = window.authStore?.getSession?.();
+  const hasRemoteAuth = window.supabaseService?.isReady?.();
+  const isLocalSession = sessionUser?.mode === "local";
 
-  if (sessionUser?.username) {
+  if (isLocalSession && sessionUser?.username) {
     applySignedInActions(sessionUser);
   }
 
-  body.classList.remove("auth-pending");
+  if (!hasRemoteAuth || isLocalSession) {
+    body.classList.remove("auth-pending");
+  }
 }
 
 async function hydrateAuthLinks() {
-  const currentUser = await window.authStore?.getCurrentUser?.();
+  try {
+    const currentUser = await window.authStore?.getCurrentUser?.();
 
-  if (currentUser && primaryAuthLink && secondaryAuthLink) {
-    applySignedInActions(currentUser);
-  } else if (logoutAuthButton) {
-    logoutAuthButton.classList.add("is-hidden");
+    if (currentUser && primaryAuthLink && secondaryAuthLink) {
+      applySignedInActions(currentUser);
+    } else if (logoutAuthButton) {
+      logoutAuthButton.classList.add("is-hidden");
+    }
+  } catch (error) {
+    if (logoutAuthButton) {
+      logoutAuthButton.classList.add("is-hidden");
+    }
   }
 
   body.classList.remove("auth-pending");

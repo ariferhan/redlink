@@ -3,6 +3,7 @@ const registerForm = document.querySelector("#register-form");
 const authMessage = document.querySelector("#auth-message");
 const params = new URLSearchParams(window.location.search);
 const draftHint = document.querySelector("#draft-hint");
+const authSwitch = document.querySelector(".auth-switch");
 let isRedirecting = false;
 
 function setMessage(message, isError = false) {
@@ -29,7 +30,15 @@ async function bootAuthPage() {
     const currentUser = await window.authStore.getCurrentUser();
 
     if (currentUser) {
-      redirectTo(`admin.html?session=${currentUser.username}`);
+      setMessage("Zaten giriş yaptın. İstersen doğrudan kontrol paneline dönebilirsin.");
+      if (authSwitch) {
+        authSwitch.innerHTML = `Kontrol paneline dönmek için <a href="admin.html?session=${currentUser.username}">buraya tıkla</a>.`;
+      }
+      const primaryTopbarAction = document.querySelector(".topbar-actions .pill-button.solid");
+      if (primaryTopbarAction) {
+        primaryTopbarAction.textContent = "Panele dön";
+        primaryTopbarAction.href = `admin.html?session=${currentUser.username}`;
+      }
       return;
     }
 

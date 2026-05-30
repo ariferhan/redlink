@@ -100,13 +100,14 @@ function getSession() {
   return window.profileStore.readStorage(SESSION_KEY, null);
 }
 
-function setSession(user) {
+function setSession(user, mode = "local") {
   const session = {
     id: user.id,
     email: user.email || "",
     username: user.username,
     name: user.name,
     role: normalizeRole(user.role),
+    mode,
     loggedInAt: new Date().toISOString(),
   };
 
@@ -184,7 +185,13 @@ async function clearSession() {
 }
 
 async function getCurrentUser() {
+  const session = getSession();
+
   if (window.supabaseService?.isReady()) {
+    if (session?.mode === "local" && session?.username) {
+      return getUserByUsername(session.username);
+    }
+
     const remoteUser = await window.supabaseService.getUser();
 
     if (remoteUser) {
@@ -199,9 +206,9 @@ async function getCurrentUser() {
         role: normalizeRole(accountDirectory?.role),
       };
     }
-  }
 
-  const session = getSession();
+    return null;
+  }
 
   if (!session?.username) {
     return null;
@@ -220,7 +227,7 @@ async function loginUser(identifier, password) {
   );
 
   if (demoUser) {
-    setSession(demoUser);
+    setSession(demoUser, "local");
     return {
       ok: true,
       user: {
@@ -356,7 +363,7 @@ async function updateAccountSettings({ currentUsername, email, username, name, c
 
   saveUsers(updatedUsers);
   const updatedUser = updatedUsers.find((user) => user.id === currentUser.id);
-  setSession(updatedUser);
+  setSession(updatedUser, "local");
 
   return { ok: true, emailChanged, user: updatedUser };
 }
@@ -570,7 +577,7 @@ async function registerUser({ name, email, username, password }) {
     window.profileStore.buildDefaultProfile(normalized, trimmedName),
     trimmedName
   );
-  setSession(newUser);
+  setSession(newUser, "local");
 
   return { ok: true, user: newUser };
 }
@@ -579,12 +586,16 @@ async function requireAuth(redirectUrl = "login.html") {
   const params = new URLSearchParams(window.location.search);
   const sessionUsername = params.get("session");
 
-  if (sessionUsername && !window.supabaseService?.isReady()) {
-    const urlUser = getUserByUsername(sessionUsername);
+  if (sessionUsername) {
+    const remoteUser = window.supabaseService?.isReady() ? await window.supabaseService.getUser() : null;
 
-    if (urlUser) {
-      setSession(urlUser);
-      return urlUser;
+    if (!remoteUser) {
+      const urlUser = getUserByUsername(sessionUsername);
+
+      if (urlUser) {
+        setSession(urlUser, "local");
+        return urlUser;
+      }
     }
   }
 

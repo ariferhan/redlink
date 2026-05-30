@@ -5,6 +5,7 @@ const verifyModeLabel = document.querySelector("#verify-mode-label");
 const resendButton = document.querySelector("#resend-code-button");
 const verifySignupFallback = document.querySelector("#verify-signup-fallback");
 const params = new URLSearchParams(window.location.search);
+const authSwitch = document.querySelector(".auth-switch");
 let isRedirecting = false;
 
 function setVerifyMessage(message, isError = false) {
@@ -69,7 +70,15 @@ async function initializeVerifyPage() {
   try {
     const currentUser = await window.authStore.getCurrentUser();
     if (currentUser) {
-      redirectTo(`admin.html?session=${currentUser.username}`);
+      setVerifyMessage("Bu hesap zaten doğrulanmış ve giriş yapılmış durumda.");
+      if (authSwitch) {
+        authSwitch.innerHTML = `Kontrol paneline dönmek için <a href="admin.html?session=${currentUser.username}">buraya tıkla</a>.`;
+      }
+      const primaryTopbarAction = document.querySelector(".topbar-actions .pill-button.solid");
+      if (primaryTopbarAction) {
+        primaryTopbarAction.textContent = "Panele dön";
+        primaryTopbarAction.href = `admin.html?session=${currentUser.username}`;
+      }
       return;
     }
 
