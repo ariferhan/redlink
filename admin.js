@@ -34,6 +34,10 @@ let avatarImage = "";
 let blogPosts = [];
 let blogCoverImage = "";
 
+function isUuid(value = "") {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
 function renderIconMarkup(iconName, size = 18, className = "") {
   return window.sojialIcons?.renderIcon(iconName, { size, className }) || "";
 }
@@ -469,9 +473,10 @@ function collectBlogFormData() {
   const title = blogForm.elements.blogTitle.value.trim();
   const excerpt = blogForm.elements.blogExcerpt.value.trim();
   const content = blogForm.elements.blogContent.value.trim();
+  const rawId = (blogForm.elements.blogId.value || "").trim();
 
   return window.profileStore.normalizeBlogPost({
-    id: blogForm.elements.blogId.value || undefined,
+    id: isUuid(rawId) ? rawId : undefined,
     title,
     slug: window.profileStore.slugifyBlogTitle(title),
     excerpt,

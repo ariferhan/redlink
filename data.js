@@ -400,7 +400,7 @@ async function saveProfileData(username, data, name = "Demo Admin") {
 async function listPublishedBlogPosts(limit = 12) {
   if (window.supabaseService?.isReady()) {
     const remotePosts = await window.supabaseService.listPublishedBlogs(limit);
-    if (Array.isArray(remotePosts) && remotePosts.length > 0) {
+    if (Array.isArray(remotePosts)) {
       return remotePosts.map(normalizeBlogPost);
     }
   }
@@ -413,7 +413,7 @@ async function listPublishedBlogPosts(limit = 12) {
 async function listAdminBlogPosts() {
   if (await hasRemoteAuthSession()) {
     const remotePosts = await window.supabaseService.listBlogsForAdmin();
-    if (Array.isArray(remotePosts) && remotePosts.length > 0) {
+    if (Array.isArray(remotePosts)) {
       return remotePosts.map(normalizeBlogPost);
     }
   }
@@ -424,9 +424,7 @@ async function listAdminBlogPosts() {
 async function getBlogPostBySlug(slug) {
   if (window.supabaseService?.isReady()) {
     const remotePost = await window.supabaseService.getBlogBySlug(slug);
-    if (remotePost) {
-      return normalizeBlogPost(remotePost);
-    }
+    return remotePost ? normalizeBlogPost(remotePost) : null;
   }
 
   return getBlogPostBySlugLocal(slug);
