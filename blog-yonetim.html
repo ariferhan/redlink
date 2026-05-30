@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sojial | Blog yönetimi</title>
+    <meta
+      name="description"
+      content="Sojial blog yönetim alanı. Blog yazılarını tek ekrandan oluştur, düzenle ve yayına al."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body class="admin-pending">
+    <main class="admin-shell">
+      <section class="dashboard-shell management-shell">
+        <header class="dashboard-header">
+          <div>
+            <p class="admin-kicker">Sojial blog yönetimi</p>
+            <h1>Yazılarını ayrı bir panelden yönet</h1>
+            <p class="admin-copy">
+              Blog yazılarını oluştur, kapak görseli ekle, tarihi ayarla ve anasayfaya
+              ya da detay sayfasına yayına al.
+            </p>
+          </div>
+
+          <div class="dashboard-header-actions">
+            <div class="session-banner">
+              <strong id="session-name">Yükleniyor</strong>
+              <span id="session-username">@hazirlaniyor</span>
+            </div>
+            <a class="back-link is-hidden" id="management-link" href="yonetim.html?session=admin">Yönetim</a>
+            <a class="back-link" id="control-panel-link" href="admin.html?session=admin">Kontrol paneli</a>
+            <a class="back-link" href="index.html">Ana sayfa</a>
+            <button class="back-link logout-button" id="logout-button" type="button">
+              Çıkış yap
+            </button>
+          </div>
+        </header>
+
+        <section class="dashboard-hero-cards">
+          <article class="hero-panel publish-panel">
+            <div>
+              <p class="hero-panel-label">Blog akışı</p>
+              <h2>Sınırsız yazı, tek yönetim alanı</h2>
+              <p id="public-route-subtitle">
+                Eklediğin tüm bloglar anasayfadaki kaydırılabilir blog alanına ve kendi
+                detay sayfasına otomatik taşınır.
+              </p>
+            </div>
+          </article>
+        </section>
+
+        <section class="admin-panel management-panel">
+          <section class="form-card blog-admin-card" id="blog-admin-card">
+            <div class="section-head">
+              <h2><span class="section-icon" data-icon="text" data-icon-size="18"></span> Blog yönetimi</h2>
+              <p>
+                Admin ve editör rollerine açıktır. İstediğin kadar yazı ekleyebilir,
+                görsel yükleyebilir ve yayın durumunu belirleyebilirsin.
+              </p>
+            </div>
+
+            <form class="blog-form" id="blog-form">
+              <input type="hidden" name="blogId" />
+
+              <div class="field-grid">
+                <label class="field">
+                  <span>Blog başlığı</span>
+                  <input type="text" name="blogTitle" maxlength="120" />
+                </label>
+
+                <label class="field">
+                  <span>Yayın tarihi</span>
+                  <input type="date" name="blogPublishedAt" />
+                </label>
+              </div>
+
+              <div class="blog-slug-preview">
+                <strong>Bağlantı:</strong>
+                <span id="blog-slug-preview">/blog-basligi</span>
+              </div>
+
+              <label class="field">
+                <span>Kısa özet</span>
+                <textarea name="blogExcerpt" rows="3"></textarea>
+              </label>
+
+              <label class="field">
+                <span>İçerik</span>
+                <textarea name="blogContent" rows="12"></textarea>
+              </label>
+
+              <div class="blog-cover-card">
+                <div class="blog-cover-preview is-empty" id="blog-cover-preview">
+                  <span data-icon="image" data-icon-size="26"></span>
+                </div>
+                <div class="blog-cover-copy">
+                  <strong>Kapak görseli</strong>
+                  <p>Blog kartlarında ve detay sayfasında sabit oranlı görsel olarak gösterilir.</p>
+                </div>
+              </div>
+
+              <div class="avatar-upload-actions">
+                <label class="action secondary upload-trigger">
+                  <input type="file" id="blog-cover-input" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden />
+                  Görsel yükle
+                </label>
+                <button class="action secondary" id="remove-blog-cover-button" type="button">
+                  Görseli kaldır
+                </button>
+              </div>
+
+              <label class="checkbox-row">
+                <input type="checkbox" name="blogPublished" checked />
+                <span>Bu yazıyı anasayfada ve detay sayfasında yayına al</span>
+              </label>
+
+              <div class="action-row blog-action-row">
+                <button class="action primary" type="submit">Blogu kaydet</button>
+                <button class="action secondary" type="button" id="reset-blog-form">
+                  Yeni yazı
+                </button>
+                <p class="status-message" id="blog-status-message" aria-live="polite"></p>
+              </div>
+            </form>
+
+            <div class="blog-manager-list">
+              <div class="section-head section-head-inline">
+                <h2><span class="section-icon" data-icon="copy" data-icon-size="18"></span> Kayıtlı yazılar</h2>
+                <p>Tüm yayınlar burada listelenir. Düzenle, aç veya kaldır.</p>
+              </div>
+              <div class="blog-list" id="blog-list"></div>
+            </div>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-service.js"></script>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="auth.js"></script>
+    <script src="blog-yonetim.js"></script>
+    <script src="cookie-consent.js"></script>
+  </body>
+</html>

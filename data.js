@@ -233,6 +233,12 @@ function normalizeBlogPost(post = {}) {
   const excerpt = (post.excerpt || "").trim();
   const content = (post.content || "").trim();
   const slug = slugifyBlogTitle(post.slug || title);
+  const coverImage = post.coverImage || post.cover_image || "";
+  const publishedAt = post.publishedAt || post.published_at || new Date().toISOString();
+  const isPublished = typeof post.isPublished === "boolean" ? post.isPublished : post.is_published !== false;
+  const createdAt = post.createdAt || post.created_at || new Date().toISOString();
+  const updatedAt = post.updatedAt || post.updated_at || new Date().toISOString();
+  const authorUsername = post.authorUsername || post.author_username || "admin";
 
   return {
     id: post.id || `blog-${Date.now()}`,
@@ -240,12 +246,12 @@ function normalizeBlogPost(post = {}) {
     slug,
     excerpt,
     content,
-    coverImage: post.coverImage || "",
-    publishedAt: post.publishedAt || new Date().toISOString(),
-    isPublished: post.isPublished !== false,
-    createdAt: post.createdAt || new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    authorUsername: post.authorUsername || "admin",
+    coverImage,
+    publishedAt,
+    isPublished,
+    createdAt,
+    updatedAt,
+    authorUsername,
   };
 }
 
@@ -397,7 +403,7 @@ async function saveProfileData(username, data, name = "Demo Admin") {
   return saveProfileDataLocal(username, data, name);
 }
 
-async function listPublishedBlogPosts(limit = 12) {
+async function listPublishedBlogPosts(limit = null) {
   if (window.supabaseService?.isReady()) {
     const remotePosts = await window.supabaseService.listPublishedBlogs(limit);
     if (Array.isArray(remotePosts)) {
@@ -405,9 +411,8 @@ async function listPublishedBlogPosts(limit = 12) {
     }
   }
 
-  return loadBlogsLocal()
-    .filter((post) => post.isPublished)
-    .slice(0, limit);
+  const publishedPosts = loadBlogsLocal().filter((post) => post.isPublished);
+  return typeof limit === "number" ? publishedPosts.slice(0, limit) : publishedPosts;
 }
 
 async function listAdminBlogPosts() {

@@ -278,7 +278,7 @@ async function hydrateBlogs() {
     return;
   }
 
-  const posts = await window.profileStore.listPublishedBlogPosts(12);
+  const posts = await window.profileStore.listPublishedBlogPosts();
   blogRail.innerHTML = "";
 
   if (!posts.length) {

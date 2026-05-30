@@ -4,9 +4,13 @@ const addLinkButton = document.querySelector("#add-link-button");
 const statusMessage = document.querySelector("#status-message");
 const linkEditor = document.querySelector("#link-editor");
 const previewCard = document.querySelector("#preview-card");
+const previewModal = document.querySelector("#preview-modal");
+const openPreviewModalButton = document.querySelector("#open-preview-modal");
+const closePreviewModalButton = document.querySelector("#close-preview-modal");
 const logoutButton = document.querySelector("#logout-button");
 const sessionName = document.querySelector("#session-name");
 const sessionUsername = document.querySelector("#session-username");
+const blogManagementLink = document.querySelector("#blog-management-link");
 const publicRoute = document.querySelector("#public-route");
 const copyProfileLinkButton = document.querySelector("#copy-profile-link");
 const viewProfileLink = document.querySelector("#view-profile-link");
@@ -16,7 +20,8 @@ const managementLink = document.querySelector("#management-link");
 const avatarUploadInput = document.querySelector("#avatar-upload-input");
 const removeAvatarButton = document.querySelector("#remove-avatar-button");
 const settingsAvatar = document.querySelector('[data-settings="avatar"]');
-const blogAdminCard = document.querySelector("#blog-admin-card");
+const accountSettingsToggle = document.querySelector("#account-settings-toggle");
+const accountSettingsPanel = document.querySelector("#account-settings-panel");
 const blogForm = document.querySelector("#blog-form");
 const blogSlugPreview = document.querySelector("#blog-slug-preview");
 const blogStatusMessage = document.querySelector("#blog-status-message");
@@ -64,6 +69,11 @@ function getDisplayRoute() {
 
 function getBlogHref(slug) {
   return `blog.html?slug=${encodeURIComponent(slug)}`;
+}
+
+function withSession(pathname) {
+  const username = currentUser?.username || "admin";
+  return `${pathname}?session=${encodeURIComponent(username)}`;
 }
 
 function formatBlogDate(date) {
@@ -124,10 +134,11 @@ function updateRouteUI() {
     viewProfileLink.rel = "noreferrer";
   }
 
-  const previewAddress = previewCard.querySelector('[data-preview="address"]');
-  if (previewAddress) {
-    previewAddress.textContent = displayRoute;
-  }
+  const previewAddress = previewCard?.querySelector('[data-preview="address"]');
+  if (previewAddress) previewAddress.textContent = displayRoute;
+
+  const previewSummaryAddress = document.querySelector('[data-preview-summary="address"]');
+  if (previewSummaryAddress) previewSummaryAddress.textContent = displayRoute;
 }
 
 function createLinkRow(link) {
@@ -143,8 +154,6 @@ function createLinkRow(link) {
   row.innerHTML = `
     <div class="link-badge">
       <span class="icon">${renderIconMarkup(meta.icon, 18)}</span>
-      <span>${meta.label}</span>
-      <span class="link-hint">${meta.hint}</span>
     </div>
     <label class="field">
       <span>Platform / ikon</span>
@@ -160,6 +169,7 @@ function createLinkRow(link) {
         type="text"
         data-role="url"
         placeholder="${meta.hint}"
+        title="${meta.hint}"
         value="${denormalizeSocialValue(link.platform, link.url)}"
       />
     </label>
@@ -254,20 +264,23 @@ function renderAvatarPreview(name) {
     renderAvatarInto(settingsAvatar, draft);
   }
 
-  const previewAvatar = previewCard.querySelector('[data-preview="avatar"]');
-  if (previewAvatar) {
-    renderAvatarInto(previewAvatar, draft);
-  }
+  document.querySelectorAll('[data-preview="avatar"]').forEach((avatarNode) => {
+    renderAvatarInto(avatarNode, draft);
+  });
 }
 
-function renderPreview(data) {
-  renderAvatarInto(previewCard.querySelector('[data-preview="avatar"]'), data);
-  previewCard.querySelector('[data-preview="name"]').textContent = data.name;
-  const activeLanguage = data.activeLanguage || "tr";
-  previewCard.querySelector('[data-preview="eyebrow"]').textContent = data.title[activeLanguage] || data.title.tr;
-  previewCard.querySelector('[data-preview="bio"]').textContent = data.bio[activeLanguage] || data.bio.tr;
+function renderPreviewCard(card, data) {
+  if (!card) {
+    return;
+  }
 
-  const linksContainer = previewCard.querySelector(".links");
+  renderAvatarInto(card.querySelector('[data-preview="avatar"]'), data);
+  card.querySelector('[data-preview="name"]').textContent = data.name;
+  const activeLanguage = data.activeLanguage || "tr";
+  card.querySelector('[data-preview="eyebrow"]').textContent = data.title[activeLanguage] || data.title.tr;
+  card.querySelector('[data-preview="bio"]').textContent = data.bio[activeLanguage] || data.bio.tr;
+
+  const linksContainer = card.querySelector(".links");
   linksContainer.innerHTML = "";
 
   data.links.forEach((link) => {
@@ -282,6 +295,11 @@ function renderPreview(data) {
     `;
     linksContainer.appendChild(element);
   });
+}
+
+function renderPreview(data) {
+  renderPreviewCard(previewCard, data);
+  const activeLanguage = data.activeLanguage || "tr";
 
   previewLocaleButtons.forEach((button, index) => {
     const langs = ["tr", "en", "de"];
@@ -296,13 +314,51 @@ function setStatus(message, isError = false) {
   statusMessage.style.color = isError ? "#d64545" : "";
 }
 
+function openPreviewModal() {
+  if (!previewModal) {
+    return;
+  }
+
+  previewModal.classList.remove("is-hidden");
+  previewModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+}
+
+function closePreviewModal() {
+  if (!previewModal) {
+    return;
+  }
+
+  previewModal.classList.add("is-hidden");
+  previewModal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+}
+
+function toggleAccountSettings(forceOpen) {
+  if (!accountSettingsToggle || !accountSettingsPanel) {
+    return;
+  }
+
+  const shouldOpen =
+    typeof forceOpen === "boolean"
+      ? forceOpen
+      : accountSettingsPanel.classList.contains("is-collapsed");
+
+  accountSettingsPanel.classList.toggle("is-collapsed", !shouldOpen);
+  accountSettingsToggle.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+  const icon = accountSettingsToggle.querySelector(".section-toggle-icon");
+  if (icon) {
+    icon.textContent = shouldOpen ? "−" : "+";
+  }
+}
+
 function refreshLinkRowMeta(row) {
   const platform = row.querySelector('[data-role="platform"]').value;
   const meta = getPlatformMeta(platform);
   row.querySelector(".icon").innerHTML = renderIconMarkup(meta.icon, 18);
   row.querySelector(".link-badge span:nth-child(2)").textContent = meta.label;
-  row.querySelector(".link-hint").textContent = meta.hint;
   row.querySelector('[data-role="url"]').placeholder = meta.hint;
+  row.querySelector('[data-role="url"]').title = meta.hint;
   if (!row.querySelector('[data-role="label"]').value.trim()) {
     row.querySelector('[data-role="label"]').value = meta.label;
   }
@@ -489,7 +545,7 @@ function collectBlogFormData() {
 }
 
 async function loadBlogsForAdmin() {
-  if (!canManageBlogs()) {
+  if (!canManageBlogs() || !blogList) {
     return;
   }
 
@@ -537,7 +593,12 @@ async function initializeAdmin() {
 
     if (sessionName) sessionName.textContent = currentUser.name;
     if (sessionUsername) sessionUsername.textContent = `@${currentUser.username}`;
+    if (blogManagementLink && canManageBlogs()) {
+      blogManagementLink.href = withSession("blog-yonetim.html");
+      blogManagementLink.classList.remove("is-hidden");
+    }
     if (managementLink && isAdminUser()) {
+      managementLink.href = withSession("yonetim.html");
       managementLink.classList.remove("is-hidden");
     }
 
@@ -545,11 +606,6 @@ async function initializeAdmin() {
     fillForm();
     renderPreview(profileData);
     window.sojialIcons?.mount(document);
-
-    if (canManageBlogs()) {
-      blogAdminCard?.classList.remove("is-hidden");
-      await loadBlogsForAdmin();
-    }
 
     form.addEventListener("input", () => {
       renderAvatarPreview(form.elements.name.value.trim() || currentUser.name);
@@ -606,6 +662,18 @@ async function initializeAdmin() {
     });
 
     downloadQrButton?.addEventListener("click", downloadQrSvg);
+    openPreviewModalButton?.addEventListener("click", openPreviewModal);
+    closePreviewModalButton?.addEventListener("click", closePreviewModal);
+    previewModal?.addEventListener("click", (event) => {
+      if (event.target.closest('[data-close-preview="true"]')) {
+        closePreviewModal();
+      }
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closePreviewModal();
+      }
+    });
 
     copyProfileLinkButton.addEventListener("click", async () => {
       try {
@@ -650,6 +718,10 @@ async function initializeAdmin() {
       renderPreview(collectFormData());
       renderAvatarPreview(form.elements.name.value.trim() || currentUser.name);
       setStatus("Profil fotoğrafı kaldırıldı. Baş harfler gösterilecek.");
+    });
+
+    accountSettingsToggle?.addEventListener("click", () => {
+      toggleAccountSettings();
     });
 
     blogForm?.addEventListener("input", (event) => {
@@ -726,6 +798,8 @@ async function initializeAdmin() {
         }
       }
     });
+
+    toggleAccountSettings(false);
   } catch (error) {
     setStatus(error?.message || "Kontrol paneli yüklenirken bir sorun oluştu.", true);
   } finally {

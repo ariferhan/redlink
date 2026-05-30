@@ -1,16 +1,16 @@
 :root {
-  --bg: #f4f5ff;
-  --bg-deep: #eceeff;
-  --surface: rgba(255, 255, 255, 0.84);
-  --surface-strong: rgba(255, 255, 255, 0.96);
-  --line: rgba(25, 34, 63, 0.08);
-  --line-strong: rgba(25, 34, 63, 0.12);
-  --text: #11182b;
-  --muted: #697186;
-  --soft: #8e95a8;
-  --brand: #6f7cff;
-  --brand-soft: rgba(111, 124, 255, 0.12);
-  --shadow: 0 24px 80px rgba(73, 81, 120, 0.12);
+  --bg: #f8f8f6;
+  --bg-deep: #f1f1ee;
+  --surface: rgba(255, 255, 255, 0.88);
+  --surface-strong: rgba(255, 255, 255, 0.97);
+  --line: rgba(37, 42, 52, 0.08);
+  --line-strong: rgba(37, 42, 52, 0.12);
+  --text: #17191f;
+  --muted: #75777f;
+  --soft: #a5a7ae;
+  --brand: #8a90a2;
+  --brand-soft: rgba(138, 144, 162, 0.12);
+  --shadow: 0 22px 60px rgba(63, 69, 88, 0.08);
   --radius-xl: 30px;
   --radius-lg: 24px;
   --radius-md: 18px;
@@ -53,8 +53,8 @@ body {
   font-family: "Manrope", sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at 20% 18%, rgba(214, 220, 255, 0.85), transparent 30%),
-    radial-gradient(circle at 85% 12%, rgba(230, 233, 255, 0.8), transparent 22%),
+    radial-gradient(circle at 18% 18%, rgba(241, 241, 236, 0.92), transparent 28%),
+    radial-gradient(circle at 82% 14%, rgba(244, 244, 240, 0.88), transparent 22%),
     linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
   transition:
     background 180ms ease,
@@ -129,12 +129,12 @@ button {
   width: min(100% - var(--site-edge-gap), var(--site-shell-max));
   margin: 16px auto 0;
   padding: 16px 24px;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(215, 216, 220, 0.72);
   border-radius: 26px;
-  box-shadow: 0 18px 42px rgba(31, 42, 78, 0.1);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 12px 32px rgba(34, 39, 54, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 body.marketing-page.is-dark .topbar {
@@ -253,7 +253,7 @@ body.marketing-page.is-dark .pill-button.solid {
 
 .hero-stage {
   position: relative;
-  min-height: 620px;
+  min-height: 700px;
   display: grid;
   place-items: center;
 }
@@ -261,6 +261,8 @@ body.marketing-page.is-dark .pill-button.solid {
 .hero-copyblock {
   position: relative;
   z-index: 2;
+  width: min(100%, 1080px);
+  text-align: center;
 }
 
 .hero-kicker {
@@ -283,8 +285,11 @@ body.marketing-page.is-dark .pill-button.solid {
 }
 
 .hero-block h1 {
-  max-width: 12ch;
-  font-size: clamp(3.6rem, 8vw, 5.8rem);
+  max-width: 15.8ch;
+  font-size: clamp(2.25rem, 5vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.96;
+  letter-spacing: -0.072em;
 }
 
 .hero-title {
@@ -356,11 +361,12 @@ body.marketing-page.is-dark .pill-button.solid {
   place-items: center;
   width: 76px;
   height: 76px;
-  border: 1px solid rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.56);
   border-radius: 26px;
-  box-shadow: 0 22px 42px rgba(67, 76, 112, 0.12);
+  box-shadow: 0 22px 42px rgba(67, 76, 112, 0.16);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
+  color: #fff;
 }
 
 .hero-float-badge .icon-svg {
@@ -369,94 +375,89 @@ body.marketing-page.is-dark .pill-button.solid {
 }
 
 .badge-instagram {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 240, 248, 0.95));
-  color: #ea4c89;
+  background: linear-gradient(180deg, #fd5c82, #c837ab);
 }
 
 .badge-youtube {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 243, 243, 0.95));
-  color: #ff3b30;
+  background: linear-gradient(180deg, #ff5d53, #e11d48);
 }
 
 .badge-whatsapp {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(240, 255, 245, 0.96));
-  color: #22c55e;
+  background: linear-gradient(180deg, #3adf7a, #16a34a);
 }
 
 .badge-telegram {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(240, 247, 255, 0.96));
-  color: #309bff;
+  background: linear-gradient(180deg, #4ab3ff, #2078ff);
 }
 
 .badge-linkedin {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(240, 246, 255, 0.96));
-  color: #2563eb;
+  background: linear-gradient(180deg, #3f8cff, #2563eb);
 }
 
 .badge-x,
 .badge-tiktok,
 .badge-discord {
-  background: rgba(255, 255, 255, 0.92);
+  color: #fff;
 }
 
 .badge-x {
-  color: #161b29;
+  background: linear-gradient(180deg, #1f2432, #06080d);
 }
 
 .badge-tiktok {
-  color: #171717;
+  background: linear-gradient(135deg, #0f172a, #1f2937 45%, #ff3e7f 100%);
 }
 
 .badge-discord {
-  color: #5b6ee1;
+  background: linear-gradient(180deg, #7387ff, #5363e4);
 }
 
 .badge-one {
-  top: 8%;
+  top: 9%;
   left: 10%;
-  animation: float-slow 6s ease-in-out infinite;
+  animation: float-slow 4.2s ease-in-out infinite;
 }
 
 .badge-two {
-  top: 14%;
-  right: 12%;
-  animation: float-slow 6.8s ease-in-out infinite 0.4s;
+  top: 10%;
+  right: 10%;
+  animation: float-slow 4.5s ease-in-out infinite 0.25s;
 }
 
 .badge-three {
-  top: 38%;
+  top: 32%;
   left: 18%;
-  animation: float-slow 6.4s ease-in-out infinite 0.8s;
+  animation: float-slow 4s ease-in-out infinite 0.55s;
 }
 
 .badge-four {
-  top: 34%;
-  right: 18%;
-  animation: float-slow 5.8s ease-in-out infinite 1s;
+  top: 32%;
+  right: 14%;
+  animation: float-slow 4.1s ease-in-out infinite 0.7s;
 }
 
 .badge-five {
   bottom: 18%;
-  left: 6%;
-  animation: float-slow 7s ease-in-out infinite 0.2s;
+  left: 10%;
+  animation: float-slow 4.8s ease-in-out infinite 0.15s;
 }
 
 .badge-six {
   bottom: 16%;
-  right: 8%;
-  animation: float-slow 6.6s ease-in-out infinite 0.7s;
+  right: 10%;
+  animation: float-slow 4.3s ease-in-out infinite 0.4s;
 }
 
 .badge-seven {
-  bottom: 2%;
-  left: 12%;
-  animation: float-slow 6.2s ease-in-out infinite 1.2s;
+  bottom: 4%;
+  left: 28%;
+  animation: float-slow 4s ease-in-out infinite 0.85s;
 }
 
 .badge-eight {
-  bottom: 2%;
-  right: 12%;
-  animation: float-slow 7.4s ease-in-out infinite 0.9s;
+  bottom: 4%;
+  right: 28%;
+  animation: float-slow 4.4s ease-in-out infinite 0.6s;
 }
 
 @keyframes hero-title-rise {
@@ -1252,31 +1253,39 @@ body.marketing-page.is-dark .pill-button.solid {
   mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
 }
 
+.footer-logo-row-inner {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: max-content;
+  will-change: transform;
+}
+
 .footer-logo-track {
   display: flex;
   align-items: center;
   gap: 14px;
   width: max-content;
-  padding-inline: 10px;
-  will-change: transform;
+  flex: 0 0 auto;
+  padding-inline: 0;
 }
 
-.footer-logo-row-left .footer-logo-track {
+.footer-logo-row-left .footer-logo-row-inner {
   animation: footer-marquee-left 28s linear infinite;
 }
 
-.footer-logo-row-right .footer-logo-track {
+.footer-logo-row-right .footer-logo-row-inner {
   animation: footer-marquee-right 32s linear infinite;
 }
 
-.footer-logo-row-left-slow .footer-logo-track {
+.footer-logo-row-left-slow .footer-logo-row-inner {
   animation: footer-marquee-left 38s linear infinite;
 }
 
 .footer-logo-pill {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   min-height: 56px;
   padding: 0 18px;
   border: 1px solid rgba(31, 42, 78, 0.08);
@@ -1290,12 +1299,83 @@ body.marketing-page.is-dark .pill-button.solid {
   box-shadow: 0 14px 36px rgba(127, 136, 161, 0.08);
 }
 
-.footer-legal-band {
-  padding: 28px 0 32px;
-  background: #161821;
+.footer-logo-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 0;
+  color: #fff;
+  flex: 0 0 auto;
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+  box-shadow: none;
 }
 
-.footer-shell-expanded {
+.footer-logo-mark .icon-svg {
+  width: 20px;
+  height: 20px;
+}
+
+.footer-logo-mark > * {
+  display: none;
+}
+
+.footer-logo-mark-text {
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+}
+
+.network-instagram .footer-logo-mark { background-image: url("assets/brand-icons/instagram.svg"); }
+.network-facebook .footer-logo-mark { background-image: url("assets/brand-icons/facebook.svg"); }
+.network-x .footer-logo-mark { background-image: url("assets/brand-icons/x.svg"); }
+.network-threads .footer-logo-mark { background-image: url("assets/brand-icons/threads.svg"); }
+.network-bluesky .footer-logo-mark { background-image: url("assets/brand-icons/bluesky.svg"); }
+.network-mastodon .footer-logo-mark { background-image: url("assets/brand-icons/mastodon.svg"); }
+.network-linkedin .footer-logo-mark {
+  background-image: none;
+  color: #2563eb;
+}
+
+.network-linkedin .footer-logo-mark > * {
+  display: block;
+}
+.network-tiktok .footer-logo-mark { background-image: url("assets/brand-icons/tiktok.svg"); }
+.network-snapchat .footer-logo-mark { background-image: url("assets/brand-icons/snapchat.svg"); }
+.network-pinterest .footer-logo-mark { background-image: url("assets/brand-icons/pinterest.svg"); }
+.network-reddit .footer-logo-mark { background-image: url("assets/brand-icons/reddit.svg"); }
+.network-tumblr .footer-logo-mark { background-image: url("assets/brand-icons/tumblr.svg"); }
+.network-vk .footer-logo-mark { background-image: url("assets/brand-icons/vk.svg"); }
+.network-weibo .footer-logo-mark { background-image: url("assets/brand-icons/sinaweibo.svg"); }
+.network-telegram .footer-logo-mark { background-image: url("assets/brand-icons/telegram.svg"); }
+.network-whatsapp .footer-logo-mark { background-image: url("assets/brand-icons/whatsapp.svg"); }
+.network-signal .footer-logo-mark { background-image: url("assets/brand-icons/signal.svg"); }
+.network-discord .footer-logo-mark { background-image: url("assets/brand-icons/discord.svg"); }
+.network-youtube .footer-logo-mark { background-image: url("assets/brand-icons/youtube.svg"); }
+.network-twitch .footer-logo-mark { background-image: url("assets/brand-icons/twitch.svg"); }
+.network-kick .footer-logo-mark { background-image: url("assets/brand-icons/kick.svg"); }
+.network-github .footer-logo-mark { background-image: url("assets/brand-icons/github.svg"); }
+.network-behance .footer-logo-mark { background-image: url("assets/brand-icons/behance.svg"); }
+.network-dribbble .footer-logo-mark { background-image: url("assets/brand-icons/dribbble.svg"); }
+.network-deviantart .footer-logo-mark { background-image: url("assets/brand-icons/deviantart.svg"); }
+.network-artstation .footer-logo-mark { background-image: url("assets/brand-icons/artstation.svg"); }
+.network-medium .footer-logo-mark { background-image: url("assets/brand-icons/medium.svg"); }
+.network-substack .footer-logo-mark { background-image: url("assets/brand-icons/substack.svg"); }
+.network-wordpress .footer-logo-mark { background-image: url("assets/brand-icons/wordpress.svg"); }
+.network-steam .footer-logo-mark { background-image: url("assets/brand-icons/steam.svg"); }
+.network-spotify .footer-logo-mark { background-image: url("assets/brand-icons/spotify.svg"); }
+
+.footer-legal-band {
+  padding: 28px 0 32px;
+  background: #000000;
+}
+
+.footer-shell.footer-shell-expanded {
+  width: min(100%, var(--site-shell-max));
+  margin: 0 auto;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -1379,7 +1459,7 @@ body.marketing-page.is-dark .pill-button.solid {
   gap: 18px;
   margin-top: 28px;
   padding-top: 18px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .footer-bottom p {
@@ -1423,19 +1503,19 @@ body.marketing-page.is-dark .pill-button.solid {
 
 @keyframes footer-marquee-left {
   from {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
 @keyframes footer-marquee-right {
   from {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
   to {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
 }
 
@@ -1786,11 +1866,11 @@ body:not(.profile-pending) .profile-loader {
 @keyframes float-slow {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
 
   50% {
-    transform: translateY(-10px);
+    transform: translate3d(0, -14px, 0);
   }
 }
 
@@ -2034,8 +2114,9 @@ body:not(.profile-pending) .profile-loader {
 
 @media (max-width: 520px) {
   .hero-block h1 {
-    max-width: 9ch;
-    font-size: clamp(2.8rem, 15vw, 4rem);
+    max-width: 10.5ch;
+    font-size: clamp(2.45rem, 10.4vw, 3.35rem);
+    line-height: 1;
   }
 
   .hero-stage {

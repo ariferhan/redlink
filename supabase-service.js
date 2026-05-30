@@ -403,17 +403,18 @@
     return role === "admin" || role === "editor";
   }
 
-  async function listPublishedBlogs(limit = 12) {
+  async function listPublishedBlogs(limit = null) {
     if (!client) {
       return [];
     }
 
-    const { data, error } = await client
-      .from("blog_posts")
-      .select("*")
-      .eq("is_published", true)
-      .order("published_at", { ascending: false })
-      .limit(limit);
+    let query = client.from("blog_posts").select("*").eq("is_published", true).order("published_at", { ascending: false });
+
+    if (typeof limit === "number") {
+      query = query.limit(limit);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       return [];

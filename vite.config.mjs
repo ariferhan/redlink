@@ -11,6 +11,7 @@ const staticFiles = [
   "verify-page.js",
   "reset-password.js",
   "admin.js",
+  "blog-yonetim.js",
   "yonetim.js",
   "profile-page.js",
   "blog-page.js",
@@ -48,6 +49,7 @@ export default defineConfig({
       input: {
         main: resolve(process.cwd(), "index.html"),
         admin: resolve(process.cwd(), "admin.html"),
+        blogManagement: resolve(process.cwd(), "blog-yonetim.html"),
         yonetim: resolve(process.cwd(), "yonetim.html"),
         login: resolve(process.cwd(), "login.html"),
         forgotPassword: resolve(process.cwd(), "forgot-password.html"),
