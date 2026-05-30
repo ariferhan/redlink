@@ -76,6 +76,20 @@ body {
   visibility: hidden;
 }
 
+.admin-pending::before {
+  content: "Panel hazırlanıyor...";
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  color: #6e7487;
+  font-size: 1rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, rgba(238, 244, 255, 0.92), rgba(245, 239, 233, 0.92));
+  z-index: 30;
+}
+
 .back-link {
   display: inline-flex;
   align-items: center;

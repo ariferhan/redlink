@@ -5,6 +5,7 @@ const verifyModeLabel = document.querySelector("#verify-mode-label");
 const resendButton = document.querySelector("#resend-code-button");
 const verifySignupFallback = document.querySelector("#verify-signup-fallback");
 const params = new URLSearchParams(window.location.search);
+let isRedirecting = false;
 
 function setVerifyMessage(message, isError = false) {
   if (!verifyMessage) {
@@ -13,6 +14,16 @@ function setVerifyMessage(message, isError = false) {
 
   verifyMessage.textContent = message;
   verifyMessage.style.color = isError ? "#d64545" : "var(--muted)";
+}
+
+function revealVerifyPage() {
+  document.body.classList.remove("auth-page-pending");
+}
+
+function redirectTo(url) {
+  isRedirecting = true;
+  revealVerifyPage();
+  window.location.href = url;
 }
 
 function getVerifyContext() {
@@ -55,78 +66,87 @@ async function sendCodeAgain(context) {
 }
 
 async function initializeVerifyPage() {
-  const currentUser = await window.authStore.getCurrentUser();
-  if (currentUser) {
-    window.location.href = `admin.html?session=${currentUser.username}`;
-    return;
-  }
-
-  const context = getVerifyContext();
-
-  if (!context.email) {
-    window.location.href = "login.html";
-    return;
-  }
-
-  if (verifyEmail) {
-    verifyEmail.textContent = context.email;
-  }
-
-  if (verifyModeLabel) {
-    verifyModeLabel.textContent =
-      context.mode === "signup" ? "Üyeliğini kod ile tamamla" : "Giriş kodunu doğrula";
-  }
-
-  if (context.mode === "signup" && verifySignupFallback) {
-    const pendingSignup = window.authStore.readPendingSignup?.();
-    const needsFallback = !pendingSignup || pendingSignup.email !== context.email;
-    verifySignupFallback.hidden = !needsFallback;
-
-    if (needsFallback) {
-      verifyForm.elements.name.value = context.username || context.email.split("@")[0] || "";
-      verifyForm.elements.username.value = context.username || "";
+  try {
+    const currentUser = await window.authStore.getCurrentUser();
+    if (currentUser) {
+      redirectTo(`admin.html?session=${currentUser.username}`);
+      return;
     }
-  }
 
-  verifyForm?.addEventListener("submit", async (event) => {
-    event.preventDefault();
+    const context = getVerifyContext();
 
-    const token = verifyForm.elements.token.value;
-    let signupFallback = null;
+    if (!context.email) {
+      redirectTo("login.html");
+      return;
+    }
 
-    if (context.mode === "signup") {
+    if (verifyEmail) {
+      verifyEmail.textContent = context.email;
+    }
+
+    if (verifyModeLabel) {
+      verifyModeLabel.textContent =
+        context.mode === "signup" ? "Üyeliğini kod ile tamamla" : "Giriş kodunu doğrula";
+    }
+
+    if (context.mode === "signup" && verifySignupFallback) {
       const pendingSignup = window.authStore.readPendingSignup?.();
-      if (!pendingSignup || pendingSignup.email !== context.email) {
-        signupFallback = getSignupFallbackValues(context);
+      const needsFallback = !pendingSignup || pendingSignup.email !== context.email;
+      verifySignupFallback.hidden = !needsFallback;
 
-        if (!signupFallback.name || !signupFallback.username || !signupFallback.password) {
-          setVerifyMessage("Üyeliği tamamlamak için ad, kullanıcı adı ve şifre alanlarını doldur.", true);
-          return;
-        }
+      if (needsFallback) {
+        verifyForm.elements.name.value = context.username || context.email.split("@")[0] || "";
+        verifyForm.elements.username.value = context.username || "";
       }
     }
 
-    const result = await window.authStore.verifyEmailCode(context.email, token, context.mode, signupFallback);
+    verifyForm?.addEventListener("submit", async (event) => {
+      event.preventDefault();
 
-    if (!result.ok) {
-      setVerifyMessage(result.message, true);
-      return;
+      const token = verifyForm.elements.token.value;
+      let signupFallback = null;
+
+      if (context.mode === "signup") {
+        const pendingSignup = window.authStore.readPendingSignup?.();
+        if (!pendingSignup || pendingSignup.email !== context.email) {
+          signupFallback = getSignupFallbackValues(context);
+
+          if (!signupFallback.name || !signupFallback.username || !signupFallback.password) {
+            setVerifyMessage("Üyeliği tamamlamak için ad, kullanıcı adı ve şifre alanlarını doldur.", true);
+            return;
+          }
+        }
+      }
+
+      const result = await window.authStore.verifyEmailCode(context.email, token, context.mode, signupFallback);
+
+      if (!result.ok) {
+        setVerifyMessage(result.message, true);
+        return;
+      }
+
+      setVerifyMessage("Kod doğrulandı, paneline yönlendiriliyorsun.");
+      redirectTo(`admin.html?session=${result.user.username}`);
+    });
+
+    resendButton?.addEventListener("click", async () => {
+      const result = await sendCodeAgain(context);
+
+      if (!result.ok) {
+        setVerifyMessage(result.message, true);
+        return;
+      }
+
+      setVerifyMessage("Yeni kod gönderildi. Gelen kutunu tekrar kontrol et.");
+    });
+  } catch (error) {
+    setVerifyMessage(error?.message || "Doğrulama ekranı hazırlanırken bir sorun oluştu.", true);
+  } finally {
+    if (!isRedirecting) {
+      revealVerifyPage();
     }
-
-    setVerifyMessage("Kod doğrulandı, paneline yönlendiriliyorsun.");
-    window.location.href = `admin.html?session=${result.user.username}`;
-  });
-
-  resendButton?.addEventListener("click", async () => {
-    const result = await sendCodeAgain(context);
-
-    if (!result.ok) {
-      setVerifyMessage(result.message, true);
-      return;
-    }
-
-    setVerifyMessage("Yeni kod gönderildi. Gelen kutunu tekrar kontrol et.");
-  });
+  }
 }
 
+window.setTimeout(revealVerifyPage, 1200);
 initializeVerifyPage();

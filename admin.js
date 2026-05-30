@@ -513,208 +513,212 @@ async function saveBlogPost() {
 }
 
 async function initializeAdmin() {
-  currentUser = await window.authStore.requireAuth();
+  try {
+    currentUser = await window.authStore.requireAuth();
 
-  if (!currentUser) {
-    return;
-  }
-
-  profileData = await window.profileStore.loadProfileData(currentUser.username, currentUser.name);
-  editableLinks = [...profileData.links];
-
-  if (sessionName) sessionName.textContent = currentUser.name;
-  if (sessionUsername) sessionUsername.textContent = `@${currentUser.username}`;
-  if (managementLink && isAdminUser()) {
-    managementLink.classList.remove("is-hidden");
-  }
-
-  buildLinkEditor();
-  fillForm();
-  renderPreview(profileData);
-  window.sojialIcons?.mount(document);
-
-  if (canManageBlogs()) {
-    blogAdminCard?.classList.remove("is-hidden");
-    await loadBlogsForAdmin();
-  }
-
-  document.body.classList.remove("admin-pending");
-
-  form.addEventListener("input", () => {
-    renderAvatarPreview(form.elements.name.value.trim() || currentUser.name);
-    renderPreview(collectFormData());
-    setStatus("Önizleme güncellendi.");
-  });
-
-  previewLocaleButtons.forEach((button, index) => {
-    button.addEventListener("click", () => {
-      const langs = ["tr", "en", "de"];
-      form.elements.activeLanguage.value = langs[index];
-      renderPreview(collectFormData());
-      setStatus("Birincil dil güncellendi.");
-    });
-  });
-
-  linkEditor.addEventListener("change", (event) => {
-    const row = event.target.closest(".link-row");
-    if (!row) return;
-    if (event.target.dataset.role === "platform") {
-      refreshLinkRowMeta(row);
+    if (!currentUser) {
+      return;
     }
-    renderPreview(collectFormData());
-  });
 
-  linkEditor.addEventListener("click", (event) => {
-    const button = event.target.closest('[data-role="remove"]');
-    if (!button) return;
-    button.closest(".link-row").remove();
-    renderPreview(collectFormData());
-    setStatus("Bağlantı kaldırıldı.");
-  });
-
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    await saveProfile();
-  });
-
-  resetButton.addEventListener("click", async () => {
-    const defaultData = window.profileStore.buildDefaultProfile(currentUser.username, currentUser.name);
-    profileData = await window.profileStore.saveProfileData(currentUser.username, defaultData, currentUser.name);
+    profileData = await window.profileStore.loadProfileData(currentUser.username, currentUser.name);
     editableLinks = [...profileData.links];
+
+    if (sessionName) sessionName.textContent = currentUser.name;
+    if (sessionUsername) sessionUsername.textContent = `@${currentUser.username}`;
+    if (managementLink && isAdminUser()) {
+      managementLink.classList.remove("is-hidden");
+    }
+
     buildLinkEditor();
     fillForm();
     renderPreview(profileData);
-    setStatus("Varsayılan profil geri yüklendi.");
-  });
+    window.sojialIcons?.mount(document);
 
-  addLinkButton.addEventListener("click", () => {
-    editableLinks.push(window.profileStore.createLink(`link-${Date.now()}`, "telegram"));
-    buildLinkEditor();
-    renderPreview(collectFormData());
-    setStatus("Yeni sosyal bağlantı alanı eklendi.");
-  });
-
-  downloadQrButton?.addEventListener("click", downloadQrSvg);
-
-  copyProfileLinkButton.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(getPublicProfileUrl());
-      setStatus("Profil linki panoya kopyalandı.");
-    } catch (error) {
-      setStatus("Link kopyalanamadı. Tarayıcı izinlerini kontrol et.", true);
-    }
-  });
-
-  logoutButton.addEventListener("click", async () => {
-    await window.authStore.clearSession();
-    window.location.href = "login.html";
-  });
-
-  avatarUploadInput?.addEventListener("change", async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      return;
+    if (canManageBlogs()) {
+      blogAdminCard?.classList.remove("is-hidden");
+      await loadBlogsForAdmin();
     }
 
-    if (!file.type.startsWith("image/")) {
-      setStatus("Sadece görsel dosyaları yükleyebilirsin.", true);
-      return;
-    }
+    form.addEventListener("input", () => {
+      renderAvatarPreview(form.elements.name.value.trim() || currentUser.name);
+      renderPreview(collectFormData());
+      setStatus("Önizleme güncellendi.");
+    });
 
-    try {
-      avatarImage = await readAvatarFile(file);
+    previewLocaleButtons.forEach((button, index) => {
+      button.addEventListener("click", () => {
+        const langs = ["tr", "en", "de"];
+        form.elements.activeLanguage.value = langs[index];
+        renderPreview(collectFormData());
+        setStatus("Birincil dil güncellendi.");
+      });
+    });
+
+    linkEditor.addEventListener("change", (event) => {
+      const row = event.target.closest(".link-row");
+      if (!row) return;
+      if (event.target.dataset.role === "platform") {
+        refreshLinkRowMeta(row);
+      }
+      renderPreview(collectFormData());
+    });
+
+    linkEditor.addEventListener("click", (event) => {
+      const button = event.target.closest('[data-role="remove"]');
+      if (!button) return;
+      button.closest(".link-row").remove();
+      renderPreview(collectFormData());
+      setStatus("Bağlantı kaldırıldı.");
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      await saveProfile();
+    });
+
+    resetButton.addEventListener("click", async () => {
+      const defaultData = window.profileStore.buildDefaultProfile(currentUser.username, currentUser.name);
+      profileData = await window.profileStore.saveProfileData(currentUser.username, defaultData, currentUser.name);
+      editableLinks = [...profileData.links];
+      buildLinkEditor();
+      fillForm();
+      renderPreview(profileData);
+      setStatus("Varsayılan profil geri yüklendi.");
+    });
+
+    addLinkButton.addEventListener("click", () => {
+      editableLinks.push(window.profileStore.createLink(`link-${Date.now()}`, "telegram"));
+      buildLinkEditor();
+      renderPreview(collectFormData());
+      setStatus("Yeni sosyal bağlantı alanı eklendi.");
+    });
+
+    downloadQrButton?.addEventListener("click", downloadQrSvg);
+
+    copyProfileLinkButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(getPublicProfileUrl());
+        setStatus("Profil linki panoya kopyalandı.");
+      } catch (error) {
+        setStatus("Link kopyalanamadı. Tarayıcı izinlerini kontrol et.", true);
+      }
+    });
+
+    logoutButton.addEventListener("click", async () => {
+      await window.authStore.clearSession();
+      window.location.href = "login.html";
+    });
+
+    avatarUploadInput?.addEventListener("change", async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) {
+        return;
+      }
+
+      if (!file.type.startsWith("image/")) {
+        setStatus("Sadece görsel dosyaları yükleyebilirsin.", true);
+        return;
+      }
+
+      try {
+        avatarImage = await readAvatarFile(file);
+        renderPreview(collectFormData());
+        renderAvatarPreview(form.elements.name.value.trim() || currentUser.name);
+        setStatus("Profil fotoğrafı önizlemeye eklendi.");
+      } catch (error) {
+        setStatus(error.message || "Fotoğraf yüklenemedi.", true);
+      }
+    });
+
+    removeAvatarButton?.addEventListener("click", () => {
+      avatarImage = "";
+      if (avatarUploadInput) {
+        avatarUploadInput.value = "";
+      }
       renderPreview(collectFormData());
       renderAvatarPreview(form.elements.name.value.trim() || currentUser.name);
-      setStatus("Profil fotoğrafı önizlemeye eklendi.");
-    } catch (error) {
-      setStatus(error.message || "Fotoğraf yüklenemedi.", true);
-    }
-  });
+      setStatus("Profil fotoğrafı kaldırıldı. Baş harfler gösterilecek.");
+    });
 
-  removeAvatarButton?.addEventListener("click", () => {
-    avatarImage = "";
-    if (avatarUploadInput) {
-      avatarUploadInput.value = "";
-    }
-    renderPreview(collectFormData());
-    renderAvatarPreview(form.elements.name.value.trim() || currentUser.name);
-    setStatus("Profil fotoğrafı kaldırıldı. Baş harfler gösterilecek.");
-  });
-
-  blogForm?.addEventListener("input", (event) => {
-    if (event.target.name === "blogTitle") {
-      updateBlogSlugPreview();
-    }
-  });
-
-  blogForm?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    await saveBlogPost();
-  });
-
-  resetBlogFormButton?.addEventListener("click", () => {
-    resetBlogForm();
-    setBlogStatus("Yeni blog taslağı hazır.");
-  });
-
-  blogCoverInput?.addEventListener("change", async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      return;
-    }
-
-    if (!file.type.startsWith("image/")) {
-      setBlogStatus("Sadece görsel dosyaları yükleyebilirsin.", true);
-      return;
-    }
-
-    try {
-      blogCoverImage = await readAvatarFile(file);
-      renderBlogCoverPreview();
-      setBlogStatus("Blog görseli eklendi.");
-    } catch (error) {
-      setBlogStatus(error.message || "Görsel yüklenemedi.", true);
-    }
-  });
-
-  removeBlogCoverButton?.addEventListener("click", () => {
-    blogCoverImage = "";
-    if (blogCoverInput) {
-      blogCoverInput.value = "";
-    }
-    renderBlogCoverPreview();
-    setBlogStatus("Blog görseli kaldırıldı.");
-  });
-
-  blogList?.addEventListener("click", async (event) => {
-    const item = event.target.closest(".blog-list-item");
-    if (!item) {
-      return;
-    }
-
-    const targetId = item.dataset.blogId;
-
-    if (event.target.closest('[data-role="edit-blog"]')) {
-      const targetPost = blogPosts.find((post) => post.id === targetId);
-      if (targetPost) {
-        resetBlogForm(targetPost);
-        setBlogStatus("Blog yazısı düzenlemeye açıldı.");
+    blogForm?.addEventListener("input", (event) => {
+      if (event.target.name === "blogTitle") {
+        updateBlogSlugPreview();
       }
-      return;
-    }
+    });
 
-    if (event.target.closest('[data-role="delete-blog"]')) {
+    blogForm?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      await saveBlogPost();
+    });
+
+    resetBlogFormButton?.addEventListener("click", () => {
+      resetBlogForm();
+      setBlogStatus("Yeni blog taslağı hazır.");
+    });
+
+    blogCoverInput?.addEventListener("change", async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) {
+        return;
+      }
+
+      if (!file.type.startsWith("image/")) {
+        setBlogStatus("Sadece görsel dosyaları yükleyebilirsin.", true);
+        return;
+      }
+
       try {
-        await window.profileStore.deleteBlogPost(targetId);
-        blogPosts = await window.profileStore.listAdminBlogPosts();
-        renderBlogList();
-        resetBlogForm();
-        setBlogStatus("Blog yazısı kaldırıldı.");
+        blogCoverImage = await readAvatarFile(file);
+        renderBlogCoverPreview();
+        setBlogStatus("Blog görseli eklendi.");
       } catch (error) {
-        setBlogStatus(error.message || "Blog yazısı kaldırılamadı.", true);
+        setBlogStatus(error.message || "Görsel yüklenemedi.", true);
       }
-    }
-  });
+    });
+
+    removeBlogCoverButton?.addEventListener("click", () => {
+      blogCoverImage = "";
+      if (blogCoverInput) {
+        blogCoverInput.value = "";
+      }
+      renderBlogCoverPreview();
+      setBlogStatus("Blog görseli kaldırıldı.");
+    });
+
+    blogList?.addEventListener("click", async (event) => {
+      const item = event.target.closest(".blog-list-item");
+      if (!item) {
+        return;
+      }
+
+      const targetId = item.dataset.blogId;
+
+      if (event.target.closest('[data-role="edit-blog"]')) {
+        const targetPost = blogPosts.find((post) => post.id === targetId);
+        if (targetPost) {
+          resetBlogForm(targetPost);
+          setBlogStatus("Blog yazısı düzenlemeye açıldı.");
+        }
+        return;
+      }
+
+      if (event.target.closest('[data-role="delete-blog"]')) {
+        try {
+          await window.profileStore.deleteBlogPost(targetId);
+          blogPosts = await window.profileStore.listAdminBlogPosts();
+          renderBlogList();
+          resetBlogForm();
+          setBlogStatus("Blog yazısı kaldırıldı.");
+        } catch (error) {
+          setBlogStatus(error.message || "Blog yazısı kaldırılamadı.", true);
+        }
+      }
+    });
+  } catch (error) {
+    setStatus(error?.message || "Kontrol paneli yüklenirken bir sorun oluştu.", true);
+  } finally {
+    document.body.classList.remove("admin-pending");
+  }
 }
 
 initializeAdmin();

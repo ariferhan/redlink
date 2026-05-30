@@ -9,6 +9,20 @@
   visibility: hidden;
 }
 
+.auth-page-pending::before {
+  content: "Sayfa hazırlanıyor...";
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  color: var(--muted);
+  font-size: 1rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, rgba(238, 244, 255, 0.92), rgba(245, 239, 233, 0.92));
+  z-index: 30;
+}
+
 .auth-shell {
   flex: 1;
   display: grid;
