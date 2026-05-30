@@ -110,6 +110,76 @@ as $$
   );
 $$;
 
+create or replace function public.can_manage_blog_posts()
+returns boolean
+language sql
+stable
+security definer
+as $$
+  select exists (
+    select 1
+    from public.account_directory
+    where public.account_directory.id = auth.uid()
+      and public.account_directory.role in ('admin', 'editor')
+  );
+$$;
+
+create or replace function public.ensure_current_account_directory()
+returns void
+language plpgsql
+security definer
+as $$
+begin
+  insert into public.account_directory (id, email, role, created_at, updated_at)
+  select
+    u.id,
+    u.email,
+    coalesce(existing.role, 'member'),
+    coalesce(existing.created_at, now()),
+    now()
+  from auth.users u
+  left join public.account_directory existing on existing.id = u.id
+  where u.id = auth.uid()
+    and u.email is not null
+  on conflict (id) do update
+  set email = excluded.email,
+      updated_at = now();
+end;
+$$;
+
+create or replace function public.sync_account_directory()
+returns integer
+language plpgsql
+security definer
+as $$
+declare
+  inserted_count integer := 0;
+begin
+  if not public.is_admin_user() then
+    raise exception 'Bu işlem için admin rolü gerekiyor.';
+  end if;
+
+  with inserted as (
+    insert into public.account_directory (id, email, role, created_at, updated_at)
+    select
+      u.id,
+      u.email,
+      'member',
+      coalesce(u.created_at, now()),
+      now()
+    from auth.users u
+    left join public.account_directory directory on directory.id = u.id
+    where directory.id is null
+      and u.email is not null
+    on conflict (id) do nothing
+    returning 1
+  )
+  select count(*) into inserted_count from inserted;
+
+  return inserted_count;
+end;
+$$;
+
 create or replace function public.protect_account_directory_role()
 returns trigger
 language plpgsql
@@ -209,32 +279,19 @@ with check (
   or public.is_admin_user()
 );
 
+grant execute on function public.ensure_current_account_directory() to authenticated;
+grant execute on function public.sync_account_directory() to authenticated;
+
 drop policy if exists "public blog posts are viewable" on public.blog_posts;
 create policy "public blog posts are viewable"
 on public.blog_posts for select
 using (
   is_published = true
-  or exists (
-    select 1 from public.profiles
-    where public.profiles.id = auth.uid()
-      and public.profiles.username = 'admin'
-  )
+  or public.can_manage_blog_posts()
 );
 
 drop policy if exists "admin manages blog posts" on public.blog_posts;
 create policy "admin manages blog posts"
 on public.blog_posts for all
-using (
-  exists (
-    select 1 from public.profiles
-    where public.profiles.id = auth.uid()
-      and public.profiles.username = 'admin'
-  )
-)
-with check (
-  exists (
-    select 1 from public.profiles
-    where public.profiles.id = auth.uid()
-      and public.profiles.username = 'admin'
-  )
-);
+using (public.can_manage_blog_posts())
+with check (public.can_manage_blog_posts());

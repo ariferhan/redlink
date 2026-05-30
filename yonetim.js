@@ -146,6 +146,12 @@ async function initializeManagementPage() {
   sessionUsername.textContent = `@${currentUser.username}`;
 
   await loadManagedUsers();
+  if (window.supabaseService?.isReady() && window.authStore?.getSession?.()?.mode === "local") {
+    setStatus(
+      "Şu an demo admin oturumundasın. Gerçek kayıtlı kullanıcıları ve e-posta adreslerini görmek için admin rolü verilmiş gerçek hesabınla giriş yap.",
+      true
+    );
+  }
   document.body.classList.remove("admin-pending");
 
   refreshUsersButton?.addEventListener("click", loadManagedUsers);

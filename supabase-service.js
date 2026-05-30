@@ -260,17 +260,32 @@
       return null;
     }
 
-    const { data, error } = await client
+    let { data, error } = await client
       .from("account_directory")
       .select("id, email, role, created_at, updated_at")
       .eq("id", user.id)
       .single();
 
-    if (error) {
-      return null;
+    if (error || !data) {
+      await ensureCurrentAccountDirectory();
+      const retry = await client
+        .from("account_directory")
+        .select("id, email, role, created_at, updated_at")
+        .eq("id", user.id)
+        .single();
+      data = retry.data;
     }
 
     return data;
+  }
+
+  async function ensureCurrentAccountDirectory() {
+    if (!client) {
+      return false;
+    }
+
+    const { error } = await client.rpc("ensure_current_account_directory");
+    return !error;
   }
 
   async function saveProfile(profile) {
@@ -481,6 +496,8 @@
       return { ok: false, message: "Bu alan için admin rolü gerekiyor.", users: [] };
     }
 
+    await client.rpc("sync_account_directory");
+
     const { data: accounts, error: accountError } = await client
       .from("account_directory")
       .select("id, email, role, created_at, updated_at")
@@ -565,6 +582,7 @@
     getProfileByUsername,
     getProfileForCurrentUser,
     getCurrentAccountDirectory,
+    ensureCurrentAccountDirectory,
     saveProfile,
     getCurrentRole,
     listPublishedBlogs,

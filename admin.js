@@ -488,6 +488,13 @@ async function loadBlogsForAdmin() {
     return;
   }
 
+  if (window.supabaseService?.isReady() && window.authStore?.getSession?.()?.mode === "local") {
+    setBlogStatus(
+      "Demo admin ile eklediğin bloglar yalnızca bu tarayıcıda görünür. Canlıda görünmesi için gerçek admin hesabınla giriş yap.",
+      true
+    );
+  }
+
   blogPosts = await window.profileStore.listAdminBlogPosts();
   renderBlogList();
   resetBlogForm();
