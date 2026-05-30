@@ -13,7 +13,8 @@
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body class="marketing-page auth-pending">
+  <body class="editorial-page blog-detail-page auth-pending">
+    <div class="editorial-grid" aria-hidden="true"></div>
     <div class="page-aura page-aura-left" aria-hidden="true"></div>
     <div class="page-aura page-aura-right" aria-hidden="true"></div>
 
@@ -32,17 +33,36 @@
       </nav>
     </header>
 
-    <main class="landing-shell">
+    <main class="editorial-shell">
       <article class="blog-article" id="blog-article">
-        <p class="hero-kicker">sojial blog</p>
-        <div class="blog-article-meta">
-          <span class="blog-date" id="blog-date"></span>
-          <span class="blog-slug" id="blog-slug"></span>
-        </div>
-        <h1 id="blog-title">Yazı yükleniyor...</h1>
-        <p class="blog-article-excerpt" id="blog-excerpt"></p>
+        <section class="blog-article-hero">
+          <div class="blog-article-meta">
+            <span class="blog-date" id="blog-date"></span>
+            <span class="blog-slug" id="blog-slug"></span>
+          </div>
+
+          <h1 id="blog-title">Yazı yükleniyor...</h1>
+
+          <div class="blog-article-intro">
+            <div class="blog-article-quote" aria-hidden="true">
+              <img src="assets/blockquote.png" alt="" />
+            </div>
+            <p class="blog-article-excerpt" id="blog-excerpt"></p>
+          </div>
+        </section>
+
         <div class="blog-article-cover is-hidden" id="blog-cover"></div>
-        <div class="blog-article-content" id="blog-content"></div>
+
+        <div class="blog-article-body">
+          <aside class="blog-article-rail" aria-label="Paylaşım bağlantıları">
+            <a href="#" id="share-copy">Kp.</a>
+            <a href="#" id="share-whatsapp" target="_blank" rel="noreferrer">Wp.</a>
+            <a href="#" id="share-x" target="_blank" rel="noreferrer">X.</a>
+            <a href="#" id="share-linkedin" target="_blank" rel="noreferrer">Ln.</a>
+          </aside>
+
+          <div class="blog-article-content" id="blog-content"></div>
+        </div>
       </article>
     </main>
 
@@ -66,7 +86,6 @@
               <a href="register.html">Üye ol</a>
               <a href="login.html">Giriş yap</a>
               <a href="index.html#how-it-works">Nasıl çalışır</a>
-              <a href="index.html#blog-section">Blog</a>
             </div>
           </div>
 
@@ -82,7 +101,7 @@
           <div class="footer-col">
             <h3>İletişim</h3>
             <div class="footer-col-links">
-              <a class="footer-contact" href="mailto:noreply@sojial.app">noreply@sojial.app</a>
+              <a href="mailto:noreply@sojial.app" class="footer-contact">noreply@sojial.app</a>
               <a href="https://redkit.tr" target="_blank" rel="noreferrer">redkit ajans</a>
             </div>
           </div>
@@ -90,13 +109,21 @@
 
         <div class="footer-bottom">
           <p>© 2026 sojial. Tüm hakları saklıdır.</p>
+          <div class="footer-socials" aria-label="Sojial sosyal bağlantıları">
+            <a href="index.html" aria-label="Ana sayfa"><span data-icon="globe" data-icon-size="16"></span></a>
+            <a href="register.html" aria-label="Üye ol"><span data-icon="links" data-icon-size="16"></span></a>
+            <a href="privacy.html" aria-label="Gizlilik politikası"><span data-icon="shield" data-icon-size="16"></span></a>
+            <a href="mailto:noreply@sojial.app" aria-label="E-posta gönder"><span data-icon="sparkles" data-icon-size="16"></span></a>
+          </div>
         </div>
 
         <p class="footer-note">
-          sojial üzerinde paylaşılan bağlantıların ve blog içeriklerinin sorumluluğu ilgili kullanıcıya aittir.
-          Kaldırılmasını istediğin içerikler için
-          <a class="footer-contact" href="mailto:noreply@sojial.app">noreply@sojial.app</a>
-          adresine ulaşabilirsin.
+          sojial üzerinde paylaşılan tüm bağlantılar, profiller ve yönlendirmeler ilgili kullanıcıların
+          kendi beyanı ve sorumluluğu altındadır. sojial, kullanıcılar tarafından eklenen linklerin içeriği,
+          doğruluğu veya güncelliği üzerinde hak sahipliği iddiasında bulunmaz. Görünen logolar, marka adları
+          ve bağlantılı içerikler ilgili hak sahiplerine aittir; izinsiz kullanılamaz, çoğaltılamaz veya yeniden
+          dağıtılamaz. Bir kullanıcı hesabının farklı şekilde atfedilmesini veya kaldırılmasını talep etmek için
+          <a class="footer-contact" href="mailto:noreply@sojial.app">noreply@sojial.app</a> adresine e-posta gönderebilirsin.
         </p>
       </div>
     </footer>
@@ -108,5 +135,6 @@
     <script src="data.js"></script>
     <script src="auth.js"></script>
     <script src="blog-page.js"></script>
+    <script src="cookie-consent.js"></script>
   </body>
 </html>

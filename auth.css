@@ -35,7 +35,7 @@
 }
 
 .auth-card {
-  width: min(100%, 1080px);
+  width: min(100%, var(--site-shell-max));
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(300px, 0.72fr);
   gap: 24px;
@@ -49,7 +49,7 @@
 }
 
 .auth-card-compact {
-  width: min(100%, 860px);
+  width: min(100%, var(--site-shell-max));
   grid-template-columns: minmax(0, 0.95fr) minmax(300px, 0.85fr);
 }
 

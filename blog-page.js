@@ -7,6 +7,11 @@ const blogContent = document.querySelector("#blog-content");
 const primaryAuthLink = document.querySelector("#primary-auth-link");
 const secondaryAuthLink = document.querySelector("#secondary-auth-link");
 const logoutAuthButton = document.querySelector("#logout-auth-button");
+const shareCopyLink = document.querySelector("#share-copy");
+const shareWhatsappLink = document.querySelector("#share-whatsapp");
+const shareXLink = document.querySelector("#share-x");
+const shareLinkedinLink = document.querySelector("#share-linkedin");
+const BLOG_CACHE_PREFIX = "sojial-blog-cache";
 
 function formatBlogDate(date) {
   return new Intl.DateTimeFormat("tr-TR", {
@@ -21,12 +26,70 @@ function getBlogSlug() {
   return params.get("slug") || "";
 }
 
+function readCachedBlog(slug) {
+  try {
+    const raw = window.sessionStorage.getItem(`${BLOG_CACHE_PREFIX}:${slug}`);
+    return raw ? JSON.parse(raw) : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function writeCachedBlog(post) {
+  try {
+    window.sessionStorage.setItem(`${BLOG_CACHE_PREFIX}:${post.slug}`, JSON.stringify(post));
+  } catch (error) {}
+}
+
+function buildShareUrl(post) {
+  const current = new URL(window.location.href);
+  current.searchParams.set("slug", post.slug);
+  return current.toString();
+}
+
+function hydrateShareActions(post) {
+  const shareUrl = encodeURIComponent(buildShareUrl(post));
+  const shareText = encodeURIComponent(`${post.title} | sojial blog`);
+
+  if (shareWhatsappLink) {
+    shareWhatsappLink.href = `https://wa.me/?text=${shareText}%20${shareUrl}`;
+  }
+
+  if (shareXLink) {
+    shareXLink.href = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+  }
+
+  if (shareLinkedinLink) {
+    shareLinkedinLink.href = `https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`;
+  }
+
+  if (shareCopyLink) {
+    shareCopyLink.onclick = async (event) => {
+      event.preventDefault();
+
+      try {
+        await navigator.clipboard.writeText(buildShareUrl(post));
+        shareCopyLink.textContent = "Kld.";
+        window.setTimeout(() => {
+          shareCopyLink.textContent = "Kp.";
+        }, 1400);
+      } catch (error) {
+        shareCopyLink.textContent = "Hta.";
+        window.setTimeout(() => {
+          shareCopyLink.textContent = "Kp.";
+        }, 1400);
+      }
+    };
+  }
+}
+
 function renderBlog(post) {
   blogTitle.textContent = post.title;
   blogDate.textContent = formatBlogDate(post.publishedAt);
   blogSlug.textContent = `/${post.slug}`;
   blogExcerpt.textContent = post.excerpt || "";
   document.title = `sojial | ${post.title}`;
+  hydrateShareActions(post);
 
   if (post.coverImage) {
     blogCover.classList.remove("is-hidden");
@@ -76,6 +139,8 @@ if (logoutAuthButton) {
 (async function initializeBlogPage() {
   await hydrateAuthLinks();
   const slug = getBlogSlug();
+  const cachedPost = slug ? readCachedBlog(slug) : null;
+  let loadingTimer = null;
 
   if (!slug) {
     blogTitle.textContent = "Blog yazısı bulunamadı";
@@ -83,7 +148,20 @@ if (logoutAuthButton) {
     return;
   }
 
+  if (cachedPost) {
+    renderBlog(cachedPost);
+  } else {
+    loadingTimer = window.setTimeout(() => {
+      blogTitle.textContent = "Yazı yükleniyor...";
+      blogExcerpt.textContent = "İçerik hazırlanıyor.";
+    }, 180);
+  }
+
   const post = await window.profileStore.getBlogPostBySlug(slug);
+
+  if (loadingTimer) {
+    window.clearTimeout(loadingTimer);
+  }
 
   if (!post) {
     blogTitle.textContent = "Blog yazısı bulunamadı";
@@ -91,5 +169,6 @@ if (logoutAuthButton) {
     return;
   }
 
+  writeCachedBlog(post);
   renderBlog(post);
 })();

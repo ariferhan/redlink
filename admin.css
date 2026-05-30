@@ -10,7 +10,7 @@ body {
 }
 
 .dashboard-shell {
-  width: min(100%, 1360px);
+  width: min(100%, var(--site-shell-max));
   margin: 0 auto;
 }
 
