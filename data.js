@@ -205,6 +205,15 @@ function saveProfiles(profiles) {
   writeStorage(PROFILE_STORAGE_KEY, profiles);
 }
 
+async function hasRemoteAuthSession() {
+  if (!window.supabaseService?.isReady()) {
+    return false;
+  }
+
+  const remoteUser = await window.supabaseService.getUser();
+  return Boolean(remoteUser);
+}
+
 function slugifyBlogTitle(value = "") {
   return value
     .toLocaleLowerCase("tr-TR")
@@ -358,7 +367,7 @@ async function loadPublicProfileData(username = "admin", name = "Demo Admin") {
 }
 
 async function saveProfileData(username, data, name = "Demo Admin") {
-  if (window.supabaseService?.isReady()) {
+  if (await hasRemoteAuthSession()) {
     const payload = mergeProfileData({ ...data, username }, buildDefaultProfile(username, name));
     const avatarLink = payload.avatarImage
       ? [
@@ -398,7 +407,7 @@ async function listPublishedBlogPosts(limit = 12) {
 }
 
 async function listAdminBlogPosts() {
-  if (window.supabaseService?.isReady()) {
+  if (await hasRemoteAuthSession()) {
     const remotePosts = await window.supabaseService.listBlogsForAdmin();
     if (Array.isArray(remotePosts) && remotePosts.length > 0) {
       return remotePosts.map(normalizeBlogPost);
@@ -422,7 +431,7 @@ async function getBlogPostBySlug(slug) {
 async function saveBlogPost(post) {
   const normalized = normalizeBlogPost(post);
 
-  if (window.supabaseService?.isReady()) {
+  if (await hasRemoteAuthSession()) {
     const result = await window.supabaseService.saveBlog(normalized);
     if (result?.ok && result.post) {
       return normalizeBlogPost(result.post);
@@ -437,7 +446,7 @@ async function saveBlogPost(post) {
 }
 
 async function deleteBlogPost(id) {
-  if (window.supabaseService?.isReady()) {
+  if (await hasRemoteAuthSession()) {
     const result = await window.supabaseService.deleteBlog(id);
     if (result?.ok) {
       return true;

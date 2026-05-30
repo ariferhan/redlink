@@ -40,9 +40,11 @@ body {
 }
 
 .dashboard-header h1 {
-  font-family: "Outfit", sans-serif;
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
   font-size: clamp(2.2rem, 3vw, 3rem);
   letter-spacing: -0.06em;
+  line-height: 1.04;
 }
 
 .admin-copy,
@@ -143,9 +145,11 @@ body {
 }
 
 .hero-panel h2 {
-  font-family: "Outfit", sans-serif;
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
   font-size: clamp(1.8rem, 2vw, 2.6rem);
   letter-spacing: -0.05em;
+  line-height: 1.04;
   word-break: break-word;
 }
 
@@ -455,6 +459,164 @@ body {
   gap: 10px;
 }
 
+.management-shell {
+  padding-bottom: 48px;
+}
+
+.management-stats {
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 18px;
+}
+
+.stat-panel.compact {
+  display: grid;
+  align-content: center;
+}
+
+.role-summary {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  color: #394257;
+  font-weight: 700;
+}
+
+.management-panel {
+  margin-top: 24px;
+}
+
+.account-directory {
+  display: grid;
+  gap: 16px;
+}
+
+.account-card {
+  padding: 20px;
+  border: 1px solid rgba(224, 230, 241, 0.9);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.account-card-head,
+.account-meta,
+.account-actions,
+.account-card-title {
+  display: flex;
+}
+
+.account-card-head,
+.account-actions {
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.account-card-title {
+  align-items: center;
+  gap: 10px;
+}
+
+.account-card-title strong {
+  font-size: 1.08rem;
+  color: #1d2538;
+}
+
+.account-card-subtitle,
+.account-card-date,
+.account-empty p {
+  margin: 6px 0 0;
+  color: #6e7487;
+}
+
+.account-card-date {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.account-meta {
+  margin: 18px 0;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.account-meta div {
+  min-width: 220px;
+  display: grid;
+  gap: 4px;
+}
+
+.account-meta dt {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7b8397;
+}
+
+.account-meta dd {
+  margin: 0;
+  color: #232c41;
+  font-weight: 600;
+}
+
+.role-field {
+  min-width: 170px;
+}
+
+.role-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.role-admin {
+  background: rgba(97, 117, 255, 0.12);
+  color: #4759d6;
+}
+
+.role-editor {
+  background: rgba(75, 189, 146, 0.15);
+  color: #27815f;
+}
+
+.role-member {
+  background: rgba(133, 142, 160, 0.12);
+  color: #5f697f;
+}
+
+.account-empty {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 28px;
+  border: 1px dashed rgba(215, 221, 235, 0.95);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.44);
+  text-align: center;
+}
+
+.account-empty p {
+  margin: 0;
+}
+
+.account-empty-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(97, 117, 255, 0.1);
+  color: #6175ff;
+}
+
 .action.secondary.danger {
   color: #b33f55;
 }
@@ -594,6 +756,10 @@ body {
 }
 
 @media (max-width: 1120px) {
+  .management-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .publish-panel {
     flex-direction: column;
     align-items: flex-start;
@@ -688,6 +854,12 @@ body {
 
   .publish-actions .action {
     flex: 1 1 100%;
+  }
+
+  .account-card-head,
+  .account-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .remove-link-button {

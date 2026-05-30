@@ -261,9 +261,10 @@ body.marketing-page.is-dark .pill-button.solid {
 .story-block h2,
 .route-copy h2 {
   margin: 18px auto 0;
-  font-family: "Outfit", sans-serif;
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
   letter-spacing: -0.06em;
-  line-height: 0.96;
+  line-height: 1.04;
 }
 
 .hero-block h1 {
@@ -498,9 +499,11 @@ body.marketing-page.is-dark .pill-button.solid {
 
 .how-it-works-head h2 {
   margin: 18px auto 0;
-  font-family: "Outfit", sans-serif;
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
   font-size: clamp(2.4rem, 5vw, 3.6rem);
   letter-spacing: -0.05em;
+  line-height: 1.04;
 }
 
 .how-it-works-head p:last-child {
@@ -749,8 +752,11 @@ body.marketing-page.is-dark .pill-button.solid {
 
 .blog-section-head h2 {
   margin: 18px 0 0;
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
   font-size: clamp(2.2rem, 5vw, 3.5rem);
   letter-spacing: -0.05em;
+  line-height: 1.04;
 }
 
 .blog-section-head > p {
@@ -1012,9 +1018,11 @@ body.marketing-page.is-dark .pill-button.solid {
 
 .legal-shell h1 {
   margin: 0;
-  font-family: "Outfit", sans-serif;
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
   font-size: clamp(2.4rem, 5vw, 3.6rem);
   letter-spacing: -0.06em;
+  line-height: 1.04;
 }
 
 .legal-shell h2 {

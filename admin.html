@@ -35,6 +35,7 @@
               <strong id="session-name">Profil yükleniyor</strong>
               <span id="session-username">@hazirlaniyor</span>
             </div>
+            <a class="back-link is-hidden" id="management-link" href="yonetim.html">Yönetim</a>
             <a class="back-link" href="index.html">Ana sayfa</a>
             <button class="back-link logout-button" id="logout-button" type="button">
               Çıkış yap
@@ -186,13 +187,13 @@
             </form>
 
             <section class="form-card blog-admin-card is-hidden" id="blog-admin-card">
-              <div class="section-head">
-                <h2><span class="section-icon" data-icon="text" data-icon-size="18"></span> Blog yönetimi</h2>
-                <p>
-                  Sadece admin hesabında görünür. Blog yazısı ekle, görsel yükle ve anasayfadaki
-                  blog alanına otomatik taşı.
-                </p>
-              </div>
+                <div class="section-head">
+                  <h2><span class="section-icon" data-icon="text" data-icon-size="18"></span> Blog yönetimi</h2>
+                  <p>
+                    Admin ve editör rollerinde görünür. Blog yazısı ekle, görsel yükle ve anasayfadaki
+                    blog alanına otomatik taşı.
+                  </p>
+                </div>
 
               <form class="blog-form" id="blog-form">
                 <input type="hidden" name="blogId" />

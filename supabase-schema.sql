@@ -28,6 +28,14 @@ create table if not exists public.profile_links (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.account_directory (
+  id uuid primary key references auth.users (id) on delete cascade,
+  email text not null,
+  role text not null default 'member',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create or replace function public.handle_new_user_profile()
 returns trigger
 language plpgsql
@@ -62,6 +70,57 @@ begin
   )
   on conflict (id) do nothing;
 
+  insert into public.account_directory (
+    id,
+    email,
+    role
+  )
+  values (
+    new.id,
+    new.email,
+    case
+      when not exists (
+        select 1
+        from public.account_directory
+        where public.account_directory.role = 'admin'
+      )
+      then 'admin'
+      when lower(coalesce(new.raw_user_meta_data->>'username', split_part(new.email, '@', 1))) = 'admin'
+      then 'admin'
+      else 'member'
+    end
+  )
+  on conflict (id) do nothing;
+
+  return new;
+end;
+$$;
+
+create or replace function public.is_admin_user()
+returns boolean
+language sql
+stable
+security definer
+as $$
+  select exists (
+    select 1
+    from public.account_directory
+    where public.account_directory.id = auth.uid()
+      and public.account_directory.role = 'admin'
+  );
+$$;
+
+create or replace function public.protect_account_directory_role()
+returns trigger
+language plpgsql
+security definer
+as $$
+begin
+  if auth.uid() = old.id and old.role is distinct from new.role and not public.is_admin_user() then
+    new.role := old.role;
+  end if;
+
+  new.updated_at := now();
   return new;
 end;
 $$;
@@ -71,8 +130,14 @@ create trigger on_auth_user_created_profile
 after insert on auth.users
 for each row execute procedure public.handle_new_user_profile();
 
+drop trigger if exists on_account_directory_before_update on public.account_directory;
+create trigger on_account_directory_before_update
+before update on public.account_directory
+for each row execute procedure public.protect_account_directory_role();
+
 alter table public.profiles enable row level security;
 alter table public.profile_links enable row level security;
+alter table public.account_directory enable row level security;
 
 create table if not exists public.blog_posts (
   id uuid primary key default gen_random_uuid(),
@@ -122,6 +187,26 @@ with check (
     where public.profiles.id = profile_links.profile_id
       and public.profiles.id = auth.uid()
   )
+);
+
+drop policy if exists "users view own account directory" on public.account_directory;
+create policy "users view own account directory"
+on public.account_directory for select
+using (
+  auth.uid() = id
+  or public.is_admin_user()
+);
+
+drop policy if exists "users update own account directory" on public.account_directory;
+create policy "users update own account directory"
+on public.account_directory for update
+using (
+  auth.uid() = id
+  or public.is_admin_user()
+)
+with check (
+  auth.uid() = id
+  or public.is_admin_user()
 );
 
 drop policy if exists "public blog posts are viewable" on public.blog_posts;

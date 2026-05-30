@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sojial | Yönetim paneli</title>
+    <meta
+      name="description"
+      content="Sojial admin yönetim paneli. Kayıtlı kullanıcıları, e-posta adreslerini ve rollerini yönet."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body class="admin-pending">
+    <main class="admin-shell">
+      <section class="dashboard-shell management-shell">
+        <header class="dashboard-header">
+          <div>
+            <p class="admin-kicker">Sojial yönetim paneli</p>
+            <h1>Kullanıcıları ve rolleri yönet</h1>
+            <p class="admin-copy">
+              Bu alan sadece admin rolüne açıktır. Kayıtlı hesapları görüntüle, e-posta
+              ve kullanıcı adı bilgilerini incele, rol atamalarını güncelle.
+            </p>
+          </div>
+
+          <div class="dashboard-header-actions">
+            <div class="session-banner">
+              <strong id="session-name">Yükleniyor</strong>
+              <span id="session-username">@hazirlaniyor</span>
+            </div>
+            <a class="back-link" href="admin.html">Kontrol paneli</a>
+            <a class="back-link" href="index.html">Ana sayfa</a>
+            <button class="back-link logout-button" id="logout-button" type="button">
+              Çıkış yap
+            </button>
+          </div>
+        </header>
+
+        <section class="dashboard-hero-cards management-stats">
+          <article class="hero-panel stat-panel">
+            <p class="hero-panel-label">Toplam hesap</p>
+            <h2 id="stats-total">0</h2>
+            <p id="stats-subtitle">Sistemde kayıtlı kullanıcı bulunmuyor.</p>
+          </article>
+          <article class="hero-panel stat-panel compact">
+            <p class="hero-panel-label">Roller</p>
+            <div class="role-summary">
+              <span><strong id="stats-admin">0</strong> Admin</span>
+              <span><strong id="stats-editor">0</strong> Editör</span>
+              <span><strong id="stats-member">0</strong> Üye</span>
+            </div>
+          </article>
+        </section>
+
+        <section class="admin-panel management-panel">
+          <div class="section-head section-head-inline">
+            <div>
+              <h2><span class="section-icon" data-icon="users" data-icon-size="18"></span> Kayıtlı hesaplar</h2>
+              <p>Rol güncellemeleri anında kaydedilir. Kendi admin rolünü bu ekrandan düşüremezsin.</p>
+            </div>
+            <button class="action secondary" id="refresh-users-button" type="button">Listeyi yenile</button>
+          </div>
+
+          <p class="status-message" id="management-status" aria-live="polite"></p>
+
+          <div class="account-directory" id="account-directory"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-service.js"></script>
+    <script src="icons.js"></script>
+    <script src="data.js"></script>
+    <script src="auth.js"></script>
+    <script src="yonetim.js"></script>
+  </body>
+</html>

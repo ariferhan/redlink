@@ -12,6 +12,7 @@ const copyProfileLinkButton = document.querySelector("#copy-profile-link");
 const viewProfileLink = document.querySelector("#view-profile-link");
 const previewLocaleButtons = document.querySelectorAll(".preview-locales .locale");
 const downloadQrButton = document.querySelector("#download-qr-button");
+const managementLink = document.querySelector("#management-link");
 const avatarUploadInput = document.querySelector("#avatar-upload-input");
 const removeAvatarButton = document.querySelector("#remove-avatar-button");
 const settingsAvatar = document.querySelector('[data-settings="avatar"]');
@@ -38,7 +39,11 @@ function renderIconMarkup(iconName, size = 18, className = "") {
 }
 
 function isAdminUser() {
-  return currentUser?.username === "admin";
+  return currentUser?.role === "admin";
+}
+
+function canManageBlogs() {
+  return window.authStore?.canManageBlogs?.(currentUser?.role);
 }
 
 function getPublicProfileUrl() {
@@ -479,7 +484,7 @@ function collectBlogFormData() {
 }
 
 async function loadBlogsForAdmin() {
-  if (!isAdminUser()) {
+  if (!canManageBlogs()) {
     return;
   }
 
@@ -519,13 +524,16 @@ async function initializeAdmin() {
 
   if (sessionName) sessionName.textContent = currentUser.name;
   if (sessionUsername) sessionUsername.textContent = `@${currentUser.username}`;
+  if (managementLink && isAdminUser()) {
+    managementLink.classList.remove("is-hidden");
+  }
 
   buildLinkEditor();
   fillForm();
   renderPreview(profileData);
   window.sojialIcons?.mount(document);
 
-  if (isAdminUser()) {
+  if (canManageBlogs()) {
     blogAdminCard?.classList.remove("is-hidden");
     await loadBlogsForAdmin();
   }

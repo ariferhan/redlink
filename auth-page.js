@@ -84,6 +84,8 @@ async function bootAuthPage() {
       setMessage(result.message, true);
     }
   }
+
+  document.body.classList.remove("auth-page-pending");
 }
 
 bootAuthPage();

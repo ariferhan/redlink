@@ -4,6 +4,11 @@
   min-height: 100vh;
 }
 
+.auth-page-pending .auth-shell,
+.auth-page-pending .site-footer {
+  visibility: hidden;
+}
+
 .auth-shell {
   flex: 1;
   display: grid;
@@ -64,10 +69,11 @@
 
 .auth-card h1 {
   margin: 14px 0 0;
-  font-family: "Outfit", sans-serif;
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
   font-size: clamp(3rem, 6vw, 5.2rem);
   letter-spacing: -0.08em;
-  line-height: 0.92;
+  line-height: 1.02;
 }
 
 .auth-copy {

@@ -3,6 +3,7 @@ const SESSION_KEY = "sojial-session";
 const PENDING_SIGNUP_KEY = "sojial-pending-signup";
 const MIN_PASSWORD_LENGTH = 12;
 const MAX_PASSWORD_LENGTH = 128;
+const MANAGEABLE_ROLES = ["admin", "editor", "member"];
 const COMMON_PASSWORDS = new Set([
   "123456",
   "12345678",
@@ -49,8 +50,10 @@ function ensureDemoAccount() {
     users.push({
       id: "seed-admin",
       name: "Demo Admin",
+      email: "admin@sojial.local",
       username: "admin",
       password: "admin",
+      role: "admin",
       createdAt: new Date().toISOString(),
     });
     saveUsers(users);
@@ -69,7 +72,18 @@ function ensureDemoAccount() {
 
 function getUsers() {
   ensureDemoAccount();
-  return readUsers();
+  return readUsers().map((user) => ({
+    ...user,
+    role: normalizeRole(user.role),
+  }));
+}
+
+function normalizeRole(role) {
+  return MANAGEABLE_ROLES.includes(role) ? role : "member";
+}
+
+function canManageBlogs(role) {
+  return normalizeRole(role) === "admin" || normalizeRole(role) === "editor";
 }
 
 function getUserByUsername(username) {
@@ -88,8 +102,11 @@ function getSession() {
 
 function setSession(user) {
   const session = {
+    id: user.id,
+    email: user.email || "",
     username: user.username,
     name: user.name,
+    role: normalizeRole(user.role),
     loggedInAt: new Date().toISOString(),
   };
 
@@ -172,12 +189,14 @@ async function getCurrentUser() {
 
     if (remoteUser) {
       const profile = await window.supabaseService.getProfileForCurrentUser();
+      const accountDirectory = await window.supabaseService.getCurrentAccountDirectory();
       const username = profile?.username || remoteUser.user_metadata?.username || remoteUser.email?.split("@")[0];
       return {
         id: remoteUser.id,
         email: remoteUser.email,
         name: profile?.display_name || remoteUser.user_metadata?.full_name || username,
         username,
+        role: normalizeRole(accountDirectory?.role),
       };
     }
   }
@@ -202,7 +221,13 @@ async function loginUser(identifier, password) {
 
   if (demoUser) {
     setSession(demoUser);
-    return { ok: true, user: demoUser };
+    return {
+      ok: true,
+      user: {
+        ...demoUser,
+        role: normalizeRole(demoUser.role),
+      },
+    };
   }
 
   if (window.supabaseService?.isReady()) {
@@ -213,11 +238,13 @@ async function loginUser(identifier, password) {
     }
 
     const profile = await window.supabaseService.getProfileForCurrentUser();
+    const accountDirectory = await window.supabaseService.getCurrentAccountDirectory();
     const remoteUser = {
       id: result.user.id,
       email: result.user.email,
       name: profile?.display_name || result.user.user_metadata?.full_name || "Kullanıcı",
       username: profile?.username || result.user.user_metadata?.username || result.user.email?.split("@")[0],
+      role: normalizeRole(accountDirectory?.role),
     };
 
     return { ok: true, user: remoteUser };
@@ -286,6 +313,7 @@ async function updateAccountSettings({ currentUsername, email, username, name, c
         email: trimmedEmail,
         name: trimmedName,
         username: normalized,
+        role: normalizeRole((await window.supabaseService.getCurrentAccountDirectory())?.role),
       },
     };
   }
@@ -321,6 +349,7 @@ async function updateAccountSettings({ currentUsername, email, username, name, c
           name: trimmedName,
           username: normalized,
           email: trimmedEmail,
+          role: normalizeRole(user.role),
         }
       : user
   );
@@ -461,11 +490,13 @@ async function verifyEmailCode(email, token, mode = "login", signupFallback = nu
   }
 
   const profile = await window.supabaseService.getProfileForCurrentUser();
+  const accountDirectory = await window.supabaseService.getCurrentAccountDirectory();
   const remoteUser = {
     id: result.user.id,
     email: result.user.email,
     name: profile?.display_name || result.user.user_metadata?.full_name || "Kullanıcı",
     username: profile?.username || result.user.user_metadata?.username || result.user.email?.split("@")[0],
+    role: normalizeRole(accountDirectory?.role),
   };
 
   return { ok: true, user: remoteUser };
@@ -528,6 +559,7 @@ async function registerUser({ name, email, username, password }) {
     username: normalized,
     password: rawPassword,
     email: trimmedEmail,
+    role: "member",
     createdAt: new Date().toISOString(),
   };
 
@@ -566,9 +598,89 @@ async function requireAuth(redirectUrl = "login.html") {
   return user;
 }
 
+function mapManagedUser(user) {
+  return {
+    id: user.id,
+    name: user.name || user.displayName || "Kullanıcı",
+    username: user.username || "",
+    email: user.email || "",
+    role: normalizeRole(user.role),
+    createdAt: user.createdAt || user.created_at || new Date().toISOString(),
+    updatedAt: user.updatedAt || user.updated_at || user.createdAt || user.created_at || new Date().toISOString(),
+  };
+}
+
+async function listManagedUsers() {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser || normalizeRole(currentUser.role) !== "admin") {
+    return { ok: false, message: "Bu alanı görüntülemek için admin rolü gerekiyor.", users: [] };
+  }
+
+  if (window.supabaseService?.isReady()) {
+    const result = await window.supabaseService.listAccountsForAdmin();
+    if (!result.ok) {
+      return result;
+    }
+
+    return {
+      ok: true,
+      users: (result.users || []).map(mapManagedUser),
+    };
+  }
+
+  return {
+    ok: true,
+    users: getUsers()
+      .map(mapManagedUser)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+  };
+}
+
+async function updateManagedUserRole(userId, role) {
+  const normalizedRole = normalizeRole(role);
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser || normalizeRole(currentUser.role) !== "admin") {
+    return { ok: false, message: "Rol düzenlemek için admin olman gerekiyor." };
+  }
+
+  if (userId === currentUser.id && normalizedRole !== "admin") {
+    return { ok: false, message: "Kendi admin rolünü bu ekrandan düşüremezsin." };
+  }
+
+  if (window.supabaseService?.isReady()) {
+    return window.supabaseService.updateAccountRole(userId, normalizedRole);
+  }
+
+  const users = getUsers();
+  const targetUser = users.find((user) => user.id === userId);
+
+  if (!targetUser) {
+    return { ok: false, message: "Kullanıcı bulunamadı." };
+  }
+
+  const updatedUsers = users.map((user) =>
+    user.id === userId
+      ? {
+          ...user,
+          role: normalizedRole,
+        }
+      : user
+  );
+
+  saveUsers(updatedUsers);
+
+  return {
+    ok: true,
+    user: mapManagedUser(updatedUsers.find((user) => user.id === userId)),
+  };
+}
+
 ensureDemoAccount();
 
 window.authStore = {
+  MANAGEABLE_ROLES,
   sanitizeUsername,
   getUsers,
   getUserByUsername,
@@ -583,6 +695,9 @@ window.authStore = {
   requestSignupCode,
   verifyEmailCode,
   validatePasswordPolicy,
+  canManageBlogs,
+  listManagedUsers,
+  updateManagedUserRole,
   clearSession,
   requireAuth,
 };

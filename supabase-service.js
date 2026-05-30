@@ -253,6 +253,26 @@
     return data;
   }
 
+  async function getCurrentAccountDirectory() {
+    const user = await getUser();
+
+    if (!client || !user) {
+      return null;
+    }
+
+    const { data, error } = await client
+      .from("account_directory")
+      .select("id, email, role, created_at, updated_at")
+      .eq("id", user.id)
+      .single();
+
+    if (error) {
+      return null;
+    }
+
+    return data;
+  }
+
   async function saveProfile(profile) {
     const user = await getUser();
 
@@ -308,16 +328,18 @@
     return { ok: true };
   }
 
+  async function getCurrentRole() {
+    const account = await getCurrentAccountDirectory();
+    return account?.role || "member";
+  }
+
   async function isCurrentAdmin() {
-    const user = await getUser();
+    return (await getCurrentRole()) === "admin";
+  }
 
-    if (!user) {
-      return false;
-    }
-
-    const profile = await getProfileForCurrentUser();
-    const username = profile?.username || user.user_metadata?.username || user.email?.split("@")[0] || "";
-    return username === "admin";
+  async function canCurrentManageBlogs() {
+    const role = await getCurrentRole();
+    return role === "admin" || role === "editor";
   }
 
   async function listPublishedBlogs(limit = 12) {
@@ -344,7 +366,7 @@
       return [];
     }
 
-    const admin = await isCurrentAdmin();
+    const admin = await canCurrentManageBlogs();
 
     if (!admin) {
       return [];
@@ -364,7 +386,7 @@
       return null;
     }
 
-    const admin = await isCurrentAdmin();
+    const admin = await canCurrentManageBlogs();
     let query = client.from("blog_posts").select("*").eq("slug", slug).limit(1);
 
     if (!admin) {
@@ -385,10 +407,10 @@
       return { ok: false, message: "Supabase yapılandırılmamış." };
     }
 
-    const admin = await isCurrentAdmin();
+    const admin = await canCurrentManageBlogs();
 
     if (!admin) {
-      return { ok: false, message: "Blog yönetimi için admin hesabı gerekiyor." };
+      return { ok: false, message: "Blog yönetimi için admin veya editör rolü gerekiyor." };
     }
 
     const payload = {
@@ -433,10 +455,10 @@
       return { ok: false, message: "Supabase yapılandırılmamış." };
     }
 
-    const admin = await isCurrentAdmin();
+    const admin = await canCurrentManageBlogs();
 
     if (!admin) {
-      return { ok: false, message: "Blog yönetimi için admin hesabı gerekiyor." };
+      return { ok: false, message: "Blog yönetimi için admin veya editör rolü gerekiyor." };
     }
 
     const { error } = await client.from("blog_posts").delete().eq("id", id);
@@ -446,6 +468,84 @@
     }
 
     return { ok: true };
+  }
+
+  async function listAccountsForAdmin() {
+    if (!client) {
+      return { ok: false, message: "Supabase yapılandırılmamış.", users: [] };
+    }
+
+    const admin = await isCurrentAdmin();
+
+    if (!admin) {
+      return { ok: false, message: "Bu alan için admin rolü gerekiyor.", users: [] };
+    }
+
+    const { data: accounts, error: accountError } = await client
+      .from("account_directory")
+      .select("id, email, role, created_at, updated_at")
+      .order("created_at", { ascending: false });
+
+    if (accountError) {
+      return { ok: false, message: accountError.message, users: [] };
+    }
+
+    const { data: profiles, error: profileError } = await client
+      .from("profiles")
+      .select("id, username, display_name");
+
+    if (profileError) {
+      return { ok: false, message: profileError.message, users: [] };
+    }
+
+    const profileMap = new Map((profiles || []).map((profile) => [profile.id, profile]));
+    const users = (accounts || []).map((account) => {
+      const profile = profileMap.get(account.id);
+      return {
+        id: account.id,
+        email: account.email,
+        role: account.role,
+        username: profile?.username || account.email?.split("@")[0] || "",
+        displayName: profile?.display_name || profile?.username || account.email?.split("@")[0] || "Kullanıcı",
+        created_at: account.created_at,
+        updated_at: account.updated_at,
+      };
+    });
+
+    return { ok: true, users };
+  }
+
+  async function updateAccountRole(userId, role) {
+    if (!client) {
+      return { ok: false, message: "Supabase yapılandırılmamış." };
+    }
+
+    const admin = await isCurrentAdmin();
+    const currentUser = await getUser();
+
+    if (!admin) {
+      return { ok: false, message: "Rol düzenlemek için admin olman gerekiyor." };
+    }
+
+    if (currentUser?.id === userId && role !== "admin") {
+      return { ok: false, message: "Kendi admin rolünü bu ekrandan düşüremezsin." };
+    }
+
+    const { data, error } = await client
+      .from("account_directory")
+      .update({
+        role,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", userId)
+      .select("id, email, role, created_at, updated_at")
+      .single();
+
+    if (error) {
+      return { ok: false, message: error.message };
+    }
+
+    return { ok: true, user: data };
   }
 
   window.supabaseService = {
@@ -464,11 +564,15 @@
     signOut,
     getProfileByUsername,
     getProfileForCurrentUser,
+    getCurrentAccountDirectory,
     saveProfile,
+    getCurrentRole,
     listPublishedBlogs,
     listBlogsForAdmin,
     getBlogBySlug,
     saveBlog,
     deleteBlog,
+    listAccountsForAdmin,
+    updateAccountRole,
   };
 })();

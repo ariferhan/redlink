@@ -9,6 +9,7 @@ const staticFiles = [
   "auth-page.js",
   "verify-page.js",
   "admin.js",
+  "yonetim.js",
   "profile-page.js",
   "blog-page.js",
   "supabase-config.js",
@@ -44,6 +45,7 @@ export default defineConfig({
       input: {
         main: resolve(process.cwd(), "index.html"),
         admin: resolve(process.cwd(), "admin.html"),
+        yonetim: resolve(process.cwd(), "yonetim.html"),
         login: resolve(process.cwd(), "login.html"),
         register: resolve(process.cwd(), "register.html"),
         verify: resolve(process.cwd(), "verify.html"),
