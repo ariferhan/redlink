@@ -4,6 +4,10 @@
   const hasConfig = Boolean(config.url && config.anonKey);
   const client = hasSupabaseLibrary && hasConfig ? window.supabase.createClient(config.url, config.anonKey) : null;
 
+  function isUuid(value = "") {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+  }
+
   async function getSession() {
     if (!client) {
       return null;
@@ -471,7 +475,6 @@
     }
 
     const payload = {
-      id: post.id,
       slug: post.slug,
       title: post.title,
       excerpt: post.excerpt,
@@ -482,6 +485,10 @@
       author_username: post.authorUsername || "admin",
       updated_at: new Date().toISOString(),
     };
+
+    if (isUuid(post.id)) {
+      payload.id = post.id;
+    }
 
     const { data, error } = await client.from("blog_posts").upsert(payload).select("*").single();
 

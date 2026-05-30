@@ -224,6 +224,10 @@ function slugifyBlogTitle(value = "") {
     .replace(/-{2,}/g, "-");
 }
 
+function isUuid(value = "") {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
 function normalizeBlogPost(post = {}) {
   const title = (post.title || "").trim();
   const excerpt = (post.excerpt || "").trim();
@@ -432,7 +436,11 @@ async function saveBlogPost(post) {
   const normalized = normalizeBlogPost(post);
 
   if (await hasRemoteAuthSession()) {
-    const result = await window.supabaseService.saveBlog(normalized);
+    const remotePayload = {
+      ...normalized,
+      id: isUuid(normalized.id) ? normalized.id : undefined,
+    };
+    const result = await window.supabaseService.saveBlog(remotePayload);
     if (result?.ok && result.post) {
       return normalizeBlogPost(result.post);
     }
