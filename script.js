@@ -93,19 +93,37 @@ function loadTheme() {
   applyTheme(safeRead(THEME_KEY, "light"));
 }
 
+function applySignedInActions(user) {
+  if (!user || !primaryAuthLink || !secondaryAuthLink) {
+    return;
+  }
+
+  primaryAuthLink.textContent = "Profilini görüntüle";
+  primaryAuthLink.href = `profile.html?u=${user.username}`;
+
+  secondaryAuthLink.textContent = "Panele dön";
+  secondaryAuthLink.href = `admin.html?session=${user.username}`;
+
+  if (logoutAuthButton) {
+    logoutAuthButton.classList.remove("is-hidden");
+  }
+}
+
+function hydrateAuthLinksSync() {
+  const sessionUser = window.authStore?.getSession?.();
+
+  if (sessionUser?.username) {
+    applySignedInActions(sessionUser);
+  }
+
+  body.classList.remove("auth-pending");
+}
+
 async function hydrateAuthLinks() {
   const currentUser = await window.authStore?.getCurrentUser?.();
 
   if (currentUser && primaryAuthLink && secondaryAuthLink) {
-    primaryAuthLink.textContent = "Profilini görüntüle";
-    primaryAuthLink.href = `profile.html?u=${currentUser.username}`;
-
-    secondaryAuthLink.textContent = "Panele dön";
-    secondaryAuthLink.href = `admin.html?session=${currentUser.username}`;
-
-    if (logoutAuthButton) {
-      logoutAuthButton.classList.remove("is-hidden");
-    }
+    applySignedInActions(currentUser);
   } else if (logoutAuthButton) {
     logoutAuthButton.classList.add("is-hidden");
   }
@@ -210,5 +228,6 @@ if (logoutAuthButton) {
 
 loadTheme();
 applyComposerMode(getComposerMode());
+hydrateAuthLinksSync();
 hydrateAuthLinks();
 hydrateBlogs();

@@ -182,6 +182,7 @@ body.marketing-page.is-dark .topbar {
 
 .auth-pending .topbar-actions {
   visibility: hidden;
+  pointer-events: none;
 }
 
 .ghost-icon,
